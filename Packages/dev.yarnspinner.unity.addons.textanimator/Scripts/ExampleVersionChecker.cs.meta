@@ -1,0 +1,9 @@
+fileFormatVersion: 2
+guid: e4bedaf9f38a8445aa8761ad8c7f25e4
+AssetOrigin:
+  serializedVersion: 1
+  productId: 267061
+  packageName: Yarn Spinner+ for Unity, the friendly dialogue and narrative tool
+  packageVersion: 3.2.8
+  assetPath: Packages/dev.yarnspinner.unity.addons.textanimator/Scripts/ExampleVersionChecker.cs
+  uploadId: 968678

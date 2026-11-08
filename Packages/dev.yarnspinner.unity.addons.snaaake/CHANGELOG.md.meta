@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: e2970021f5a4e4e94ba93a3b5be801c6
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 267061
+  packageName: Yarn Spinner+ for Unity, the friendly dialogue and narrative tool
+  packageVersion: 3.2.8
+  assetPath: Packages/dev.yarnspinner.unity.addons.snaaake/CHANGELOG.md
+  uploadId: 968678

@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: e52662955dcee47bbbe24c3602e61bf7
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 12385, guid: 0000000000000000e000000000000000, type: 0}
+  disableValidation: 0
+AssetOrigin:
+  serializedVersion: 1
+  productId: 267061
+  packageName: Yarn Spinner+ for Unity, the friendly dialogue and narrative tool
+  packageVersion: 3.2.8
+  assetPath: Packages/dev.yarnspinner.unity.addons.textanimator/Scripts/Editor/TextAnimatorConfigurationWindow.uss
+  uploadId: 968678

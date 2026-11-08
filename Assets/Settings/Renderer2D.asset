@@ -23,8 +23,10 @@ MonoBehaviour:
     probeVolumeSamplingDebugShader: {fileID: 4800000, guid: 8f96cd657dc40064aa21efcc7e50a2e7, type: 3}
     probeSamplingDebugMesh: {fileID: -3555484719484374845, guid: 57d7c4c16e2765b47a4d2069b311bffe, type: 3}
     probeSamplingDebugTexture: {fileID: 2800000, guid: 24ec0e140fb444a44ab96ee80844e18e, type: 3}
-  m_RendererFeatures: []
-  m_RendererFeatureMap: 
+  m_RendererFeatures:
+  - {fileID: 3847291650417382910}
+  - {fileID: 7215836490251937844}
+  m_RendererFeatureMap: fe55744a5f53643534a8c4860ecd2364
   m_UseNativeRenderPass: 0
   m_TransparencySortMode: 0
   m_TransparencySortAxis: {x: 0, y: 1, z: 0}
@@ -67,3 +69,37 @@ MonoBehaviour:
   m_DefaultLitMaterial: {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
   m_DefaultUnlitMaterial: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
   m_DefaultMaskMaterial: {fileID: 2100000, guid: 15d0c3709176029428a0da2f8cecf0b5, type: 2}
+--- !u!114 &3847291650417382910
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fcf5ec4adff3e4f42ad3a6e6f56bd507, type: 3}
+  m_Name: TimeStopFilterFeature
+  m_EditorClassIdentifier: Assembly-CSharp::TimeStopFilterFeature
+  m_Active: 1
+  shader: {fileID: 4800000, guid: f3d53c561e17c6745a47e3d204ef92af, type: 3}
+  passEvent: 550
+  cameraTarget: 0
+  showInSceneView: 0
+--- !u!114 &7215836490251937844
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c07fbce0e8279a4bab0a576bf98b11b, type: 3}
+  m_Name: GlassBreakFilterFeature
+  m_EditorClassIdentifier: Assembly-CSharp::GlassBreakFilterFeature
+  m_Active: 1
+  shader: {fileID: 4800000, guid: dbdd7b46b1da1cb409148840a1580aa4, type: 3}
+  passEvent: 550
+  cameraTarget: 1
+  showInSceneView: 0

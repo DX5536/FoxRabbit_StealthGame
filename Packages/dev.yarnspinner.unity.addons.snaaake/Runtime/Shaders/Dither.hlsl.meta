@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 5977540e36f5f47cf8a5cc7988f1a077
+ShaderIncludeImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 267061
+  packageName: Yarn Spinner+ for Unity, the friendly dialogue and narrative tool
+  packageVersion: 3.2.8
+  assetPath: Packages/dev.yarnspinner.unity.addons.snaaake/Runtime/Shaders/Dither.hlsl
+  uploadId: 968678

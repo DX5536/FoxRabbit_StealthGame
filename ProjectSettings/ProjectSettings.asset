@@ -12,7 +12,7 @@ PlayerSettings:
   targetDevice: 2
   useOnDemandResources: 0
   accelerometerFrequency: 60
-  companyName: DefaultCompany
+  companyName: DX5536
   productName: FoxRabbit
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
@@ -675,7 +675,25 @@ PlayerSettings:
   webGLCloseOnQuit: 0
   webWasm2023: 0
   webEnableSubmoduleStrippingCompatibility: 0
-  scriptingDefineSymbols: {}
+  scriptingDefineSymbols:
+    Android: DOTWEEN;DOTWEENPRO;DOTWEEN_TEXTMESHPRO
+    EmbeddedLinux: DOTWEEN;DOTWEENPRO;DOTWEEN_TEXTMESHPRO
+    GameCoreScarlett: DOTWEEN;DOTWEENPRO;DOTWEEN_TEXTMESHPRO
+    GameCoreXboxOne: DOTWEEN;DOTWEENPRO;DOTWEEN_TEXTMESHPRO
+    Kepler: DOTWEEN;DOTWEENPRO;DOTWEEN_TEXTMESHPRO
+    LinuxHeadlessSimulation: DOTWEEN;DOTWEENPRO;DOTWEEN_TEXTMESHPRO
+    Nintendo Switch: DOTWEEN;DOTWEENPRO;DOTWEEN_TEXTMESHPRO
+    Nintendo Switch 2: DOTWEEN;DOTWEENPRO;DOTWEEN_TEXTMESHPRO
+    PS4: DOTWEEN;DOTWEENPRO;DOTWEEN_TEXTMESHPRO
+    PS5: DOTWEEN;DOTWEENPRO;DOTWEEN_TEXTMESHPRO
+    QNX: DOTWEEN;DOTWEENPRO;DOTWEEN_TEXTMESHPRO
+    Standalone: DOTWEEN;DOTWEENPRO;DOTWEEN_TEXTMESHPRO;ALLIN1_URP
+    VisionOS: DOTWEEN;DOTWEENPRO;DOTWEEN_TEXTMESHPRO
+    WebGL: DOTWEEN;DOTWEENPRO;DOTWEEN_TEXTMESHPRO
+    Windows Store Apps: DOTWEEN;DOTWEENPRO;DOTWEEN_TEXTMESHPRO
+    XboxOne: DOTWEEN;DOTWEENPRO;DOTWEEN_TEXTMESHPRO
+    iPhone: DOTWEEN;DOTWEENPRO;DOTWEEN_TEXTMESHPRO
+    tvOS: DOTWEEN;DOTWEENPRO;DOTWEEN_TEXTMESHPRO
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:
