@@ -7,7 +7,7 @@ using UnityEngine;
 public static class ScreenFilterEditorTools
 {
     static readonly string[] Tags = { "Tetra", "IgnoreTimeStop" };
-    const string IgnoreLayer = "IgnoreTimeStop";
+    static readonly string[] Layers = { "IgnoreTimeStop", "Lights2D" };
 
     [MenuItem("Tools/Screen Filters/Create TimeStop Tags & Layer")]
     public static void CreateTagsAndLayer()
@@ -37,25 +37,26 @@ public static class ScreenFilterEditorTools
             }
         }
 
-        bool layerExists = false;
-        for (int i = 0; i < layersProp.arraySize; i++)
-            if (layersProp.GetArrayElementAtIndex(i).stringValue == IgnoreLayer) { layerExists = true; break; }
-
-        if (!layerExists)
+        foreach (string layerName in Layers)
         {
+            bool layerExists = false;
+            for (int i = 0; i < layersProp.arraySize; i++)
+                if (layersProp.GetArrayElementAtIndex(i).stringValue == layerName) { layerExists = true; break; }
+            if (layerExists) continue;
+
             bool added = false;
             for (int i = 6; i < layersProp.arraySize; i++) // 0-5 are Unity built-in layers
             {
                 var layer = layersProp.GetArrayElementAtIndex(i);
                 if (string.IsNullOrEmpty(layer.stringValue))
                 {
-                    layer.stringValue = IgnoreLayer;
-                    Debug.Log($"[ScreenFilters] Added layer '{IgnoreLayer}' at index {i}.");
+                    layer.stringValue = layerName;
+                    Debug.Log($"[ScreenFilters] Added layer '{layerName}' at index {i}.");
                     added = true;
                     break;
                 }
             }
-            if (!added) Debug.LogError("[ScreenFilters] No free layer slot for 'IgnoreTimeStop'.");
+            if (!added) Debug.LogError($"[ScreenFilters] No free layer slot for '{layerName}'.");
         }
 
         tagManager.ApplyModifiedProperties();

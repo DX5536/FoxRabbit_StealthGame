@@ -76,6 +76,10 @@ public class TimeStopFilter_Manager : MonoBehaviour
     [SerializeField] Camera mainCamera;
     [Tooltip("Create an overlay camera that renders only the ignore layer on top of the filtered image.")]
     [SerializeField] bool autoSetupIgnoreCamera = true;
+    [Tooltip("2D lights are culled by camera culling mask, so the ignore camera can't see lights on Default.\n" +
+             "Lights are moved to this layer, which both cameras render (lights have no sprites, so nothing is drawn twice).")]
+    [SerializeField] string lightLayerName = "Lights2D";
+    [SerializeField] bool autoAssignLightLayer = true;
 
     [Header("Events")]
     public UnityEvent onTimeStopStart;
@@ -451,6 +455,41 @@ public class TimeStopFilter_Manager : MonoBehaviour
         data.renderType = CameraRenderType.Overlay;
         data.renderPostProcessing = false;
         baseData.cameraStack.Add(ignoreCamera);
+
+        RefreshLights();
+    }
+
+    /// <summary>
+    /// Make 2D lights visible to both cameras (call again after spawning new lights).
+    /// Without this, objects on the ignore layer are rendered unlit (black).
+    /// </summary>
+    public void RefreshLights()
+    {
+        if (!autoAssignLightLayer || ignoreCamera == null || mainCamera == null) return;
+
+        int lightLayer = LayerMask.NameToLayer(lightLayerName);
+        if (lightLayer < 0)
+        {
+            Debug.LogWarning($"[TimeStopFilter] Layer '{lightLayerName}' does not exist, ignored objects will be unlit. " +
+                             "Use Tools > Screen Filters > Create TimeStop Tags & Layer.", this);
+            return;
+        }
+
+        mainCamera.cullingMask |= 1 << lightLayer;
+        ignoreCamera.cullingMask |= 1 << lightLayer;
+
+        foreach (var light in FindObjectsByType<Light2D>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        {
+            if (light.gameObject.layer == lightLayer) continue;
+            if (light.GetComponent<Renderer>() != null)
+            {
+                // Moving it would make its sprite render in both cameras. Light visible to both cameras is still needed:
+                Debug.LogWarning($"[TimeStopFilter] Light2D '{light.name}' shares a GameObject with a renderer. " +
+                                 "Move the light to its own child object so it can go on the light layer.", light);
+                continue;
+            }
+            light.gameObject.layer = lightLayer;
+        }
     }
 
     void SetLayer(GameObject go, int layer)
