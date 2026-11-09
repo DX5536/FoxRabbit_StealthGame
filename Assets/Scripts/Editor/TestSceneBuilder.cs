@@ -16,22 +16,34 @@ using UnityEngine.UI;
 /// (movement, switching, time stop, portals), Cinemachine follow camera, screen filters and a controls overlay.
 /// Placeholder art only - swap sprites afterwards.
 /// </summary>
-public static class TestSceneBuilder
+public static partial class TestSceneBuilder
 {
     const string ScenePath = "Assets/Scenes/TestLevel.unity";
-    const string AssetFolder = "Assets/Scenes/TestLevel_Assets";
+    internal const string AssetFolder = "Assets/Scenes/TestLevel_Assets";
     const string GroundLayer = "Ground";
 
-    static Sprite square;
-    static Sprite capsule;
-    static int groundLayer;
+    internal static Sprite square;
+    internal static Sprite capsule;
+    internal static int groundLayer;
+
+    internal class Context
+    {
+        public Camera camera;
+        public CinemachineCamera vcam;
+        public TimeStopFilter_Manager filter;
+        public GlassBreakFilter glass;
+        public PlayerCharacter tetra;
+        public PlayerCharacter pricilla;
+    }
 
     [MenuItem("Tools/FoxRabbit/Build Test Scene")]
-    public static void Build()
+    public static void Build() => BuildScene(ScenePath, BuildLevel, null, new Vector2(-2f, 1f), new Vector2(-0.8f, 1f));
+
+    internal static void BuildScene(string scenePath, System.Action buildLevel, System.Action<Context> extras, Vector2 tetraPos, Vector2 pricillaPos)
     {
         if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
-        if (File.Exists(ScenePath) &&
-            !EditorUtility.DisplayDialog("Build Test Scene", $"{ScenePath} already exists. Overwrite it?", "Overwrite", "Cancel"))
+        if (File.Exists(scenePath) &&
+            !EditorUtility.DisplayDialog("Build Test Scene", $"{scenePath} already exists. Overwrite it?", "Overwrite", "Cancel"))
             return;
 
         ScreenFilterEditorTools.CreateTagsAndLayer();
@@ -81,7 +93,7 @@ public static class TestSceneBuilder
         composer.Composition = comp;
 
         // ---------- Level ----------
-        BuildLevel();
+        buildLevel();
 
         // ---------- Managers ----------
         var managers = new GameObject("> GameManager");
@@ -101,8 +113,8 @@ public static class TestSceneBuilder
         var portal0 = CreatePortalPrefab("Portal_0", new Color(0.35f, 0.75f, 1f));
         var portal1 = CreatePortalPrefab("Portal_1", new Color(1f, 0.6f, 0.25f));
 
-        var tetra = CreateCharacter("Player_Tetra", "Tetra", new Color(0.4f, 0.45f, 1f), new Vector2(-2f, 1f), playerRoot.transform);
-        var pricilla = CreateCharacter("Player_Pricilla", "Pricilla", new Color(0.9f, 0.35f, 0.45f), new Vector2(-0.8f, 1f), playerRoot.transform);
+        var tetra = CreateCharacter("Player_Tetra", "Tetra", new Color(0.4f, 0.45f, 1f), tetraPos, playerRoot.transform);
+        var pricilla = CreateCharacter("Player_Pricilla", "Pricilla", new Color(0.9f, 0.35f, 0.45f), pricillaPos, playerRoot.transform);
 
         // Tetra: hourglass + time stop
         var hourglassSprite = LoadFirstSprite("Assets/UI/Hourglass_350x500.png");
@@ -138,14 +150,26 @@ public static class TestSceneBuilder
         SetArray(controller, "characters", tetra, pricilla);
         Set(controller, "followCamera", vcam);
         vcam.Follow = tetra.transform;
+        vcamGo.transform.position = new Vector3(tetraPos.x, tetraPos.y, -10f);
 
         // ---------- UI ----------
         BuildUI(glass, filter);
 
+        extras?.Invoke(new Context { camera = cam, vcam = vcam, filter = filter, glass = glass, tetra = tetra, pricilla = pricilla });
+
         EditorSceneManager.MarkSceneDirty(scene);
-        EditorSceneManager.SaveScene(scene, ScenePath);
+        EditorSceneManager.SaveScene(scene, scenePath);
+        AddToBuildSettings(scenePath);
         AssetDatabase.SaveAssets();
-        Debug.Log($"[TestSceneBuilder] Built {ScenePath}. Press Play to test.");
+        Debug.Log($"[TestSceneBuilder] Built {scenePath}. Press Play to test.");
+    }
+
+    static void AddToBuildSettings(string path)
+    {
+        var scenes = new System.Collections.Generic.List<EditorBuildSettingsScene>(EditorBuildSettings.scenes);
+        if (scenes.Exists(s => s.path == path)) return;
+        scenes.Add(new EditorBuildSettingsScene(path, true));
+        EditorBuildSettings.scenes = scenes.ToArray();
     }
 
     #region Level
@@ -196,7 +220,7 @@ public static class TestSceneBuilder
         Label("Sign_TimeStop", level, new Vector2(54f, 8f), "Tetra: F = stop time\n(crushers freeze)");
     }
 
-    static GameObject Solid(string name, Transform parent, Vector2 center, Vector2 size, Color color)
+    internal static GameObject Solid(string name, Transform parent, Vector2 center, Vector2 size, Color color)
     {
         var go = new GameObject(name) { layer = groundLayer };
         go.transform.SetParent(parent);
@@ -210,7 +234,7 @@ public static class TestSceneBuilder
         return go;
     }
 
-    static void Label(string name, Transform parent, Vector2 pos, string text)
+    internal static void Label(string name, Transform parent, Vector2 pos, string text)
     {
         var go = new GameObject(name);
         go.transform.SetParent(parent);
@@ -430,14 +454,14 @@ public static class TestSceneBuilder
 
     static Sprite LoadPackageSprite(string path) => AssetDatabase.LoadAssetAtPath<Sprite>(path);
 
-    static Sprite LoadFirstSprite(string path)
+    internal static Sprite LoadFirstSprite(string path)
     {
         foreach (var obj in AssetDatabase.LoadAllAssetsAtPath(path))
             if (obj is Sprite s) return s;
         return null;
     }
 
-    static void Set(Object target, string field, object value)
+    internal static void Set(Object target, string field, object value)
     {
         var so = new SerializedObject(target);
         var prop = so.FindProperty(field);
@@ -451,7 +475,9 @@ public static class TestSceneBuilder
         {
             case Object o: prop.objectReferenceValue = o; break;
             case float f: prop.floatValue = f; break;
+            case int i when prop.propertyType == SerializedPropertyType.Enum: prop.enumValueIndex = i; break;
             case int i: prop.intValue = i; break;
+            case Color col: prop.colorValue = col; break;
             case bool b: prop.boolValue = b; break;
             case Vector2 v: prop.vector2Value = v; break;
             case LayerMask m: prop.intValue = m.value; break;
@@ -460,7 +486,7 @@ public static class TestSceneBuilder
         so.ApplyModifiedPropertiesWithoutUndo();
     }
 
-    static void SetArray(Object target, string field, params Object[] values)
+    internal static void SetArray(Object target, string field, params Object[] values)
     {
         var so = new SerializedObject(target);
         var prop = so.FindProperty(field);

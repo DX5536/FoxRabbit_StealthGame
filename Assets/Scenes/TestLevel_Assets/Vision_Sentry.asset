@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54dce647dc2890440b9462f0ba59ee2a, type: 3}
+  m_Name: Vision_Sentry
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyVisionProfile
+  radius: 8
+  visionAngle: 45
+  proximityRadius: 0.6
+  timeToDetect: 0.5
+  suspicionDecay: 1.5
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 129
+  rayCount: 60
+  idleColor: {r: 1, g: 0.95, b: 0.6, a: 0.18}
+  alertColor: {r: 1, g: 0.25, b: 0.2, a: 0.35}
