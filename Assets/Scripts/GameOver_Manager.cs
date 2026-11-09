@@ -12,7 +12,7 @@ using UnityEngine.UI;
 /// Call GameOver_Manager.TriggerGameOver("reason") from anywhere (EnemyVision_Manager does it automatically).
 /// If no popup is assigned, a simple one is built at runtime on a Screen Space - Overlay canvas,
 /// so it is never affected by the screen filters.
-/// Put one in each level (needed for restart-anytime). If missing, one is created when the game ends.
+/// [R] restarts on the popup (and anytime if the debug option is on). If the scene has none, one is created when the game ends.
 /// </summary>
 [DisallowMultipleComponent]
 public class GameOver_Manager : MonoBehaviour
@@ -34,8 +34,10 @@ public class GameOver_Manager : MonoBehaviour
 
     [Header("Restart")]
     [SerializeField] Key restartKey = Key.R;
-    [Tooltip("Restart with R at any time, not only on the game over screen.")]
-    [SerializeField] bool allowRestartAnytime = true;
+    [Tooltip("DEBUG: restart with R at any time, not only on the game over screen. Untick for playtests / release.")]
+    [SerializeField] bool allowRestartAnytime = false;
+    [Tooltip("Even if ticked above, restart-anytime only works in the Editor and Development Builds, never in a release build.")]
+    [SerializeField] bool restartAnytimeOnlyInDevBuilds = true;
     [Tooltip("Delay before the popup shows (lets a 'caught' sound/animation play).")]
     [SerializeField] float popupDelay = 0.25f;
     [Tooltip("Slow motion while the popup appears. 1 = off.")]
@@ -47,6 +49,11 @@ public class GameOver_Manager : MonoBehaviour
     public UnityEvent onRestart;
 
     bool restarting;
+
+    /// <summary>Toggle the debug restart-anytime at runtime (e.g. from a settings/debug menu).</summary>
+    public bool AllowRestartAnytime { get => allowRestartAnytime; set => allowRestartAnytime = value; }
+
+    bool RestartAnytimeActive => allowRestartAnytime && (!restartAnytimeOnlyInDevBuilds || Application.isEditor || Debug.isDebugBuild);
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void ResetStatics()
@@ -77,7 +84,7 @@ public class GameOver_Manager : MonoBehaviour
     {
         var kb = Keyboard.current;
         if (kb == null || !kb[restartKey].wasPressedThisFrame) return;
-        if (IsGameOver || allowRestartAnytime) Restart();
+        if (IsGameOver || RestartAnytimeActive) Restart();
     }
 
     #region Static API
