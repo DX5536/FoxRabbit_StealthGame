@@ -211,7 +211,43 @@ public class PlayerCharacter : MonoBehaviour
         if (ability != null) ability.Trigger();
     }
 
-    public bool Interact() => ability != null && ability.Interact();
+    /// <summary>
+    /// [E]: the ability gets first say (e.g. Pricilla standing in a portal teleports instead of opening a door),
+    /// otherwise the closest Interactable in range is used.
+    /// </summary>
+    public bool Interact()
+    {
+        if (ability != null && ability.Interact()) return true;
+        Interactable target = ClosestInteractable();
+        return target != null && target.Interact(this);
+    }
+
+    readonly List<Interactable> nearbyInteractables = new List<Interactable>();
+    public IReadOnlyList<Interactable> NearbyInteractables => nearbyInteractables;
+
+    public void AddInteractable(Interactable interactable)
+    {
+        if (!nearbyInteractables.Contains(interactable)) nearbyInteractables.Add(interactable);
+    }
+
+    public void RemoveInteractable(Interactable interactable) => nearbyInteractables.Remove(interactable);
+
+    /// <summary>Closest interactable this character can use right now (highest priority wins ties).</summary>
+    public Interactable ClosestInteractable()
+    {
+        Interactable best = null;
+        float bestScore = float.MaxValue;
+        Vector2 pos = col.bounds.center;
+        for (int i = nearbyInteractables.Count - 1; i >= 0; i--)
+        {
+            var it = nearbyInteractables[i];
+            if (it == null || !it.isActiveAndEnabled) { nearbyInteractables.RemoveAt(i); continue; }
+            if (!it.CanInteract(this)) continue;
+            float score = Vector2.Distance(pos, it.InteractPoint) - it.Priority * 100f;
+            if (score < bestScore) { bestScore = score; best = it; }
+        }
+        return best;
+    }
 
     #endregion
 
