@@ -41,10 +41,10 @@ public static partial class TestSceneBuilder
 
         // ===== B: Guard patrol under platforms =====
         Solid("Ground_B", level, new Vector2(18f, -1f), new Vector2(16f, 2f), ground);
-        Solid("Plat_B1", level, new Vector2(10.5f, 2f), new Vector2(2.5f, 0.5f), platform);
-        Solid("Plat_B2", level, new Vector2(14f, 4.2f), new Vector2(3f, 0.5f), platform);
-        Solid("Plat_B3", level, new Vector2(18.5f, 4.6f), new Vector2(3f, 0.5f), platform);
-        Solid("Plat_B4", level, new Vector2(23f, 4.2f), new Vector2(3f, 0.5f), platform);
+        Solid("Plat_B1", level, new Vector2(10.5f, 0.8f), new Vector2(2.5f, 1.6f), platform); // box, top 1.6 (hop over or climb)
+        Solid("Plat_B2", level, new Vector2(14f, 3.2f), new Vector2(3f, 0.5f), platform);    // top 3.45, 2.95 headroom below
+        Solid("Plat_B3", level, new Vector2(18.5f, 3.8f), new Vector2(3f, 0.5f), platform);  // top 4.05
+        Solid("Plat_B4", level, new Vector2(23f, 3.2f), new Vector2(3f, 0.5f), platform);    // top 3.45
         Solid("Cover_B", level, new Vector2(12f, 0.9f), new Vector2(0.8f, 1.8f), cover); // low cover, hide behind it
         Label("Sign_B", level, new Vector2(18.5f, 7.2f), "Go over the guard - or stop time and walk past");
 
@@ -53,25 +53,26 @@ public static partial class TestSceneBuilder
         // ===== C: Camera hall with pillars =====
         Solid("Ground_C", level, new Vector2(35f, -1f), new Vector2(18f, 2f), ground);
         Solid("Ceiling_C", level, new Vector2(35f, 8.25f), new Vector2(18f, 0.5f), wall);
-        Solid("Pillar_C1", level, new Vector2(31.5f, 1.25f), new Vector2(1f, 2.5f), cover);
-        Solid("Pillar_C2", level, new Vector2(38.5f, 1.25f), new Vector2(1f, 2.5f), cover);
+        Solid("Pillar_C1", level, new Vector2(31.5f, 0.8f), new Vector2(1f, 1.6f), cover);
+        Solid("Pillar_C2", level, new Vector2(38.5f, 0.8f), new Vector2(1f, 1.6f), cover);
         Solid("Plat_C", level, new Vector2(35f, 3.6f), new Vector2(2.5f, 0.4f), platform); // shadow right under the camera
-        Label("Sign_C", level, new Vector2(35f, 6.5f), "Camera: wait for it to look away.\nPillars cast blind spots.");
+        Label("Sign_C", level, new Vector2(35f, 6.5f), "Camera: wait for it to look away.\nThe platform right below it is a safe spot.");
         CreateCamera("SecurityCamera_1", enemies, new Vector2(35f, 7.7f), new List<float> { -50f, -130f }, cameraVision);
 
         // ===== D: Parkour + sentry on a ledge =====
-        Solid("Pit_Floor_D", level, new Vector2(47.5f, -6f), new Vector2(7f, 2f), ground);
-        Solid("Pit_Step_D", level, new Vector2(45.5f, -3.4f), new Vector2(2f, 0.4f), platform);
-        Solid("Pit_Step_D2", level, new Vector2(49.5f, -2.2f), new Vector2(1.6f, 0.4f), platform);
-        Solid("Ground_D", level, new Vector2(60f, -1f), new Vector2(18f, 2f), ground);
-        Solid("Tall_Wall_D", level, new Vector2(56f, 3f), new Vector2(1.5f, 6f), wall);
-        Solid("Step_D1", level, new Vector2(52.5f, 1.8f), new Vector2(2f, 0.4f), platform);
-        Solid("Step_D2", level, new Vector2(54f, 4f), new Vector2(1.4f, 0.4f), platform);
-        Solid("Ledge_D", level, new Vector2(62f, 5.8f), new Vector2(10f, 0.5f), platform);
-        Solid("Ledge_Cover_D", level, new Vector2(59.2f, 6.75f), new Vector2(0.6f, 1.4f), cover);
+        // 4.5 gap (sprint jump), pit with two steps back up if you miss
+        Solid("Pit_Floor_D", level, new Vector2(46.25f, -6f), new Vector2(4.5f, 2f), ground);
+        Solid("Pit_Step_D", level, new Vector2(45f, -3.5f), new Vector2(1.6f, 0.4f), platform);    // top -3.3
+        Solid("Pit_Step_D2", level, new Vector2(47.4f, -1.7f), new Vector2(1.4f, 0.4f), platform); // top -1.5
+        Solid("Ground_D", level, new Vector2(58.75f, -1f), new Vector2(20.5f, 2f), ground);
+        Solid("Tall_Wall_D", level, new Vector2(56f, 1.75f), new Vector2(1.5f, 3.5f), wall);      // top 3.5
+        Solid("Step_D1", level, new Vector2(53f, 1.6f), new Vector2(2f, 0.4f), platform);         // top 1.8
+        Solid("Ledge_D", level, new Vector2(62f, 4.8f), new Vector2(10f, 0.5f), platform);        // top 5.05, 4.55 headroom below
+        Solid("Ledge_Cover_D", level, new Vector2(59.2f, 5.75f), new Vector2(0.6f, 1.4f), cover);
         Label("Sign_D", level, new Vector2(48f, 3f), "Sprint-jump the gap (Shift)");
 
-        CreateGuard("Sentry_Ledge", enemies, new Vector2(64f, 7.05f), new[] { 60.5f, 66f }, sentryVision, -25f);
+        CreateGuard("Sentry_Ledge", enemies, new Vector2(64f, 6.05f), new[] { 60.5f, 66f }, sentryVision, -25f);
+        Label("Sign_D2", level, new Vector2(61f, 8f), "Climb the wall, or drop under the ledge\nand sneak past the sentry above");
 
         // ===== E: Goal =====
         Solid("Ground_E", level, new Vector2(76f, -1f), new Vector2(14f, 2f), ground);

@@ -186,19 +186,21 @@ public static partial class TestSceneBuilder
         Solid("Wall_Left", level, new Vector2(-12.5f, 5f), new Vector2(1f, 14f), wall);
 
         // Staircase of platforms (jump test)
-        Solid("Platform_1", level, new Vector2(5f, 1.6f), new Vector2(3f, 0.5f), platform);
-        Solid("Platform_2", level, new Vector2(9f, 3.2f), new Vector2(3f, 0.5f), platform);
-        Solid("Platform_3", level, new Vector2(13f, 4.8f), new Vector2(3f, 0.5f), platform);
+        // Rules used for every test level: max step up 1.9 (jump is 2.6), walk-jump gap <= 2.5, 2.5+ headroom under platforms.
+        Solid("Platform_1", level, new Vector2(5f, 0.8f), new Vector2(3f, 1.6f), platform);   // box, top 1.6
+        Solid("Platform_2", level, new Vector2(9f, 3.2f), new Vector2(3f, 0.5f), platform);   // top 3.45
+        Solid("Platform_3", level, new Vector2(13f, 4.8f), new Vector2(3f, 0.5f), platform);  // top 5.05
 
-        // Sprint gap (7 units: needs Shift) with a safe pit and a ramp back up
-        Solid("Pit_Floor", level, new Vector2(23.5f, -6f), new Vector2(7f, 2f), ground);
-        Solid("Pit_Step", level, new Vector2(21f, -3.5f), new Vector2(2f, 0.5f), platform);
-        Solid("Ground_AfterGap", level, new Vector2(37f, -1f), new Vector2(20f, 2f), ground);
+        // Sprint gap (4.5 units: walking jump ~3.7, sprint jump ~5.5) with a safe pit and steps back up
+        Solid("Pit_Floor", level, new Vector2(22.25f, -6f), new Vector2(4.5f, 2f), ground);
+        Solid("Pit_Step_1", level, new Vector2(21f, -3.5f), new Vector2(1.6f, 0.5f), platform);   // top -3.25
+        Solid("Pit_Step_2", level, new Vector2(23.3f, -1.6f), new Vector2(1.4f, 0.5f), platform); // top -1.35
+        Solid("Ground_AfterGap", level, new Vector2(36.25f, -1f), new Vector2(23.5f, 2f), ground);
 
         // Tall wall + ledge: the long way round, a good spot to test portals as a shortcut back
-        Solid("Tall_Wall", level, new Vector2(44f, 3.5f), new Vector2(2f, 7f), wall);
-        Solid("Ledge_Step_1", level, new Vector2(39f, 2f), new Vector2(2.5f, 0.5f), platform);
-        Solid("Ledge_Step_2", level, new Vector2(41.5f, 4.5f), new Vector2(2f, 0.5f), platform);
+        Solid("Tall_Wall", level, new Vector2(44f, 2f), new Vector2(2f, 4f), wall);                 // top 4
+        Solid("Ledge_Step_1", level, new Vector2(39.5f, 0.8f), new Vector2(2f, 1.6f), platform);    // box, top 1.6
+        Solid("Ledge_Step_2", level, new Vector2(42f, 2.8f), new Vector2(1.6f, 0.5f), platform);    // top 3.05
         Solid("Ground_Far", level, new Vector2(54f, -1f), new Vector2(20f, 2f), ground);
         Solid("Wall_Right", level, new Vector2(64.5f, 5f), new Vector2(1f, 14f), wall);
 

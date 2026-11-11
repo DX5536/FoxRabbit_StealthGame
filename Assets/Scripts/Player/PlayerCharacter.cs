@@ -69,6 +69,8 @@ public class PlayerCharacter : MonoBehaviour
     public bool IsGrounded { get; private set; }
     public bool IsSprinting { get; private set; }
     public int Facing { get; private set; } = 1;
+    /// <summary>Rest scale (other tweens must return here, not to a mid-animation scale).</summary>
+    public Vector3 BaseScale => baseScale;
     public Rigidbody2D Body2D => rb;
     public Collider2D Collider => col;
     /// <summary>When true the character ignores movement input (e.g. while teleporting).</summary>

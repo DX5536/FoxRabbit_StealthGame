@@ -58,12 +58,11 @@ public static partial class TestSceneBuilder
         // Guard in the corridor - Room A's closed door blocks its view
         CreateGuard("Guard_Corridor", enemies, new Vector2(12f, 1f), new[] { 5f, 19f }, guardVision, -5f);
 
-        // Room C: ceiling camera sweeping the exit - Door A (closed) hides the corridor from it
-        CreateCamera("Camera_RoomC", enemies, new Vector2(28f, 7.7f), new System.Collections.Generic.List<float> { -55f, -125f }, cameraVision);
+        // Room C: ceiling camera sweeping the Door A entrance - Door A (closed) hides the corridor from it.
+        // Kept off the exit (x 27-29) so the first character can wait there for the second one.
+        CreateCamera("Camera_RoomC", enemies, new Vector2(23.5f, 7.7f), new System.Collections.Generic.List<float> { -85f, -125f }, cameraVision);
         Solid("Cover_RoomC", level, new Vector2(25f, 0.6f), new Vector2(1f, 1.2f), new Color(0.4f, 0.33f, 0.28f));
 
-        // Room D: guard pacing between Door B and Pricilla's simple door - keep that door shut until it turns away
-        CreateGuard("Guard_RoomD", enemies, new Vector2(38f, 1f), new[] { 35.8f, 39.6f }, guardVision, -5f);
 
         // Corridor hiding closet (jump from the crate onto the ledge, go in, shut the door while the guard passes)
         Solid("Closet_Ledge", level, new Vector2(15.5f, 2.5f), new Vector2(6f, 0.5f), new Color(0.45f, 0.52f, 0.58f));

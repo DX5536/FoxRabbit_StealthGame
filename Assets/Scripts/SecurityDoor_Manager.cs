@@ -56,6 +56,7 @@ public class SecurityDoor_Manager : DoorBase
     Tween slideTween, countdownPulse;
     bool warned;
     bool wasPaused;
+    bool blockedNotified;
     int lastShownSecond = -1;
 
     static readonly Color OpenColor = new Color(0.4f, 1f, 0.5f);
@@ -111,7 +112,12 @@ public class SecurityDoor_Manager : DoorBase
             }
         }
 
-        if (TimeLeft <= 0f) SetOpen(false); // retries every frame while the doorway is blocked
+        // Time's up: close, or wait while someone stands in the doorway (onBlocked fires once, not every frame).
+        if (TimeLeft <= 0f)
+        {
+            if (!profile.preventClosingOnCharacters || !DoorwayOccupied()) SetOpen(false);
+            else if (!blockedNotified) { blockedNotified = true; onBlocked?.Invoke(); }
+        }
 
         UpdateCountdownText(paused);
     }
@@ -153,6 +159,7 @@ public class SecurityDoor_Manager : DoorBase
 
         if (stateLight != null) stateLight.DOColor(open ? OpenColor : ClosedColor, 0.2f).SetLink(gameObject);
 
+        blockedNotified = false;
         if (!open)
         {
             TimeLeft = 0f;

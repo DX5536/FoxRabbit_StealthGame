@@ -47,7 +47,6 @@ public class CircuitView_Manager : MonoBehaviour
     float progress;   // 0..1 draw-in
     float alpha;      // 0..1 visibility
     Tween progressTween, alphaTween;
-    static Sprite dotSprite;
 
     void Update()
     {
@@ -145,17 +144,15 @@ public class CircuitView_Manager : MonoBehaviour
             // Count how many path points are revealed, then add the partial end point.
             int count = 1;
             while (count < link.path.Length && link.cumulative[count] <= target) count++;
-            var points = new Vector3[Mathf.Min(count + 1, link.path.Length)];
-            for (int i = 0; i < count && i < link.path.Length; i++) points[i] = link.path[i];
+            // SetPosition per point: no per-frame array allocation.
+            link.line.positionCount = Mathf.Min(count + 1, link.path.Length);
+            for (int i = 0; i < count && i < link.path.Length; i++) link.line.SetPosition(i, link.path[i]);
             if (count < link.path.Length)
             {
                 float segLen = link.cumulative[count] - link.cumulative[count - 1];
                 float t = segLen > 0f ? (target - link.cumulative[count - 1]) / segLen : 1f;
-                points[count] = Vector3.Lerp(link.path[count - 1], link.path[count], t);
+                link.line.SetPosition(count, Vector3.Lerp(link.path[count - 1], link.path[count], t));
             }
-
-            link.line.positionCount = points.Length;
-            link.line.SetPositions(points);
 
             // Gentle pulse so it reads as "live" power.
             float pulse = 0.75f + 0.25f * Mathf.Sin(Time.unscaledTime * 6f);
@@ -187,30 +184,18 @@ public class CircuitView_Manager : MonoBehaviour
 
     SpriteRenderer CreateDot(Transform parent)
     {
-        if (dotSprite == null)
-        {
-            Texture2D tex = Texture2D.whiteTexture;
-            dotSprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f), tex.width);
-        }
         var go = new GameObject("Dot");
         go.transform.SetParent(parent, false);
         go.transform.localScale = Vector3.one * endDotSize;
         go.transform.rotation = Quaternion.Euler(0f, 0f, 45f);
         var sr = go.AddComponent<SpriteRenderer>();
-        sr.sprite = dotSprite;
+        sr.sprite = RuntimeAssets.WhiteSprite;
         sr.sortingLayerName = sortingLayerName;
         sr.sortingOrder = sortingOrder + 1;
         return sr;
     }
 
-    Material GetMaterial()
-    {
-        if (lineMaterial != null) return lineMaterial;
-        Shader shader = Shader.Find("Universal Render Pipeline/2D/Sprite-Unlit-Default");
-        if (shader == null) shader = Shader.Find("Sprites/Default");
-        lineMaterial = new Material(shader) { name = "CircuitLine (Runtime)" };
-        return lineMaterial;
-    }
+    Material GetMaterial() => lineMaterial != null ? lineMaterial : RuntimeAssets.UnlitMaterial;
 
     static void SetLinkActive(Link link, bool active)
     {

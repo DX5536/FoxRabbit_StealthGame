@@ -59,6 +59,7 @@ public class Teleportation_Manager : CharacterAbility
     readonly Tween[] barTweens = new Tween[2];
     readonly Vector3[] barBaseScales = { Vector3.one, Vector3.one };
     int nextIndex;
+    Portal recallLock;
     float lastTeleportTime = -99f;
     Sequence teleportSequence;
 
@@ -84,8 +85,8 @@ public class Teleportation_Manager : CharacterAbility
 
     protected override bool Activate()
     {
-        // Standing in one of her portals: pick it back up.
-        if (CurrentPortal != null && IsPlaced(CurrentPortal.Index))
+        // Standing in one of her portals: pick it back up (not the one she just placed under her feet).
+        if (CurrentPortal != null && CurrentPortal != recallLock && IsPlaced(CurrentPortal.Index))
         {
             Recall(CurrentPortal.Index);
             return true;
@@ -119,6 +120,7 @@ public class Teleportation_Manager : CharacterAbility
         }
 
         portals[index].OnPlaced();
+        recallLock = portals[index]; // can't be picked up until she has stepped out of it once
         nextIndex = 1 - index; // alternate 0, 1, 0, 1...
 
         if (moved) onPortalMoved?.Invoke(index);
@@ -167,7 +169,7 @@ public class Teleportation_Manager : CharacterAbility
         from.onTeleportFrom?.Invoke();
 
         Transform t = Character.transform;
-        Vector3 scale = t.localScale;
+        Vector3 scale = Character.BaseScale; // not t.localScale: a selection squash may be mid-animation
         float half = Mathf.Max(teleportDelay, 0f) * 0.5f;
 
         teleportSequence?.Kill();
@@ -216,6 +218,7 @@ public class Teleportation_Manager : CharacterAbility
     public void NotifyExit(Portal portal)
     {
         if (CurrentPortal == portal) CurrentPortal = null;
+        if (recallLock == portal && portal.gameObject.activeSelf) recallLock = null;
         portal.SetPrompts(false, false);
         UpdatePrompts();
     }
@@ -230,7 +233,7 @@ public class Teleportation_Manager : CharacterAbility
         {
             if (!IsPlaced(i)) continue;
             bool inside = IsSelected && portals[i] == CurrentPortal;
-            portals[i].SetPrompts(inside && IsPlaced(1 - i), inside);
+            portals[i].SetPrompts(inside && IsPlaced(1 - i), inside && portals[i] != recallLock);
         }
     }
 

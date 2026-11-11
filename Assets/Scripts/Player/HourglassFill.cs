@@ -51,7 +51,6 @@ public class HourglassFill : MonoBehaviour
         set { sandColor = value; ApplyColors(); }
     }
 
-    static Sprite whiteSprite;
     SpriteMask mask;
     SpriteRenderer topSand, bottomSand, stream;
     bool built;
@@ -109,12 +108,6 @@ public class HourglassFill : MonoBehaviour
             return;
         }
 
-        if (whiteSprite == null)
-        {
-            Texture2D tex = Texture2D.whiteTexture;
-            whiteSprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f), tex.width);
-            whiteSprite.name = "HourglassSand";
-        }
 
         var maskGo = new GameObject("Hourglass_Mask");
         maskGo.transform.SetParent(transform, false);
@@ -135,7 +128,7 @@ public class HourglassFill : MonoBehaviour
         var go = new GameObject(objName);
         go.transform.SetParent(transform, false);
         var sr = go.AddComponent<SpriteRenderer>();
-        sr.sprite = whiteSprite;
+        sr.sprite = RuntimeAssets.WhiteSprite;
         sr.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
         sr.sortingLayerID = frame.sortingLayerID;
         sr.sortingOrder = frame.sortingOrder + sandSortingOffset;

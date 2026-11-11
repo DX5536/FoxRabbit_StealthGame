@@ -39,7 +39,6 @@ public abstract class Interactable : MonoBehaviour
     SpriteRenderer popupBackground;
     Tween popupTween;
     bool popupVisible;
-    static Sprite whiteSprite;
 
     protected virtual void Awake()
     {
@@ -165,12 +164,6 @@ public abstract class Interactable : MonoBehaviour
 
     void BuildPopup()
     {
-        if (whiteSprite == null)
-        {
-            Texture2D tex = Texture2D.whiteTexture;
-            whiteSprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f), tex.width);
-        }
-
         popup = new GameObject("StatusPopup").transform;
         popup.SetParent(transform, false);
         popup.localPosition = popupOffset;
@@ -178,7 +171,7 @@ public abstract class Interactable : MonoBehaviour
         var bg = new GameObject("Background");
         bg.transform.SetParent(popup, false);
         popupBackground = bg.AddComponent<SpriteRenderer>();
-        popupBackground.sprite = whiteSprite;
+        popupBackground.sprite = RuntimeAssets.WhiteSprite;
         popupBackground.color = new Color(0.05f, 0.06f, 0.09f, 0.85f);
         popupBackground.sortingOrder = popupSortingOrder;
 

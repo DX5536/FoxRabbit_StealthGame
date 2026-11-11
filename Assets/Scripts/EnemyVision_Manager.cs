@@ -255,14 +255,7 @@ public class EnemyVision_Manager : MonoBehaviour
         coneRenderer.sortingOrder = sortingOrder;
     }
 
-    Material GetMaterial()
-    {
-        if (coneMaterial != null) return coneMaterial;
-        Shader shader = Shader.Find("Universal Render Pipeline/2D/Sprite-Unlit-Default");
-        if (shader == null) shader = Shader.Find("Sprites/Default");
-        coneMaterial = new Material(shader) { name = "VisionCone (Runtime)" };
-        return coneMaterial;
-    }
+    Material GetMaterial() => coneMaterial != null ? coneMaterial : RuntimeAssets.UnlitMaterial;
 
     void BuildCone()
     {
