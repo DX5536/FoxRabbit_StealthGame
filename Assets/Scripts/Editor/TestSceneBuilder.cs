@@ -216,7 +216,7 @@ public static partial class TestSceneBuilder
         }
 
         // Signs
-        Label("Sign_Jump", level, new Vector2(5f, 6f), "Jump: Space / W\n(hold = higher)");
+        Label("Sign_Jump", level, new Vector2(5f, 6f), "Jump: Space / W");
         Label("Sign_Sprint", level, new Vector2(21f, 3f), "Sprint: Shift\nto clear the gap");
         Label("Sign_Portal", level, new Vector2(38f, 7.5f), "Pricilla: F = place portal\nE = teleport, F in portal = pick up");
         Label("Sign_TimeStop", level, new Vector2(54f, 8f), "Tetra: F = stop time\n(crushers freeze)");

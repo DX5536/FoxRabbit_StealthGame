@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 
 /// <summary>
 /// Reads input and drives the selected PlayerCharacter.
-///   A/D or Arrows : move        Space / W / Up : jump (hold for higher)
+///   A/D or Arrows : move        Space / W / Up : jump (fixed height)
 ///   Left Shift    : sprint      Q : switch character
 ///   F             : ability     E : interact
 /// Gamepad: left stick / d-pad move, South = jump, left trigger/shoulder = sprint,
@@ -97,7 +97,6 @@ public class PlayerController : MonoBehaviour
         if (!InputEnabled)
         {
             active.SetMoveInput(0f, false);
-            active.ReleaseJump();
             return;
         }
 
@@ -124,15 +123,8 @@ public class PlayerController : MonoBehaviour
         // Jump
         bool jumpDown = kb != null && (kb[jumpKey].wasPressedThisFrame || kb[altJumpKey].wasPressedThisFrame
                                        || (arrowKeysToo && kb.upArrowKey.wasPressedThisFrame));
-        bool jumpUp = kb != null && (kb[jumpKey].wasReleasedThisFrame || kb[altJumpKey].wasReleasedThisFrame
-                                     || (arrowKeysToo && kb.upArrowKey.wasReleasedThisFrame));
-        if (pad != null)
-        {
-            jumpDown |= pad.buttonSouth.wasPressedThisFrame;
-            jumpUp |= pad.buttonSouth.wasReleasedThisFrame;
-        }
+        if (pad != null) jumpDown |= pad.buttonSouth.wasPressedThisFrame;
         if (jumpDown) active.PressJump();
-        if (jumpUp) active.ReleaseJump();
 
         // Switch / ability / interact
         if ((kb != null && kb[switchKey].wasPressedThisFrame) || (pad != null && pad.buttonNorth.wasPressedThisFrame))

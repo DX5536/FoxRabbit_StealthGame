@@ -276,6 +276,7 @@ public class GlassDirectionMapGenerator : EditorWindow
                 importer.wrapMode = TextureWrapMode.Clamp;
                 importer.textureCompression = TextureImporterCompression.Uncompressed;
                 importer.npotScale = TextureImporterNPOTScale.None;
+                importer.maxTextureSize = 1024;            // shards are big: 1024 wide is enough, ~4x smaller download (uncompressed data)
                 importer.alphaSource = TextureImporterAlphaSource.None;
                 importer.SaveAndReimport();
             }

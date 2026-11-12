@@ -29,9 +29,8 @@ public class PlayerCharacter : MonoBehaviour
     [SerializeField] float airAcceleration = 35f;
 
     [Header("Jump")]
+    [Tooltip("Every jump reaches exactly this height (no hold-for-higher).")]
     [SerializeField] float jumpHeight = 2.2f;
-    [Tooltip("Releasing jump early multiplies upward speed by this (variable jump height).")]
-    [Range(0f, 1f)] [SerializeField] float jumpCutMultiplier = 0.5f;
     [Tooltip("Can still jump this long after walking off a ledge.")]
     [SerializeField] float coyoteTime = 0.1f;
     [Tooltip("Jump pressed slightly before landing still counts.")]
@@ -84,10 +83,8 @@ public class PlayerCharacter : MonoBehaviour
     Vector3 indicatorBasePos;
 
     float moveInput;
-    bool jumpHeld;
     float lastGroundedTime = -99f;
     float lastJumpPressedTime = -99f;
-    bool jumpCutPending;
     bool isJumping;
 
     readonly List<RaycastHit2D> groundHits = new List<RaycastHit2D>();
@@ -154,13 +151,6 @@ public class PlayerCharacter : MonoBehaviour
             onJump?.Invoke();
         }
 
-        // Variable jump height
-        if (jumpCutPending)
-        {
-            if (v.y > 0f) v.y *= jumpCutMultiplier;
-            jumpCutPending = false;
-        }
-
         // Snappier fall
         if (v.y < 0f)
             v.y += Physics2D.gravity.y * rb.gravityScale * (fallGravityMultiplier - 1f) * Time.fixedDeltaTime;
@@ -196,17 +186,7 @@ public class PlayerCharacter : MonoBehaviour
         }
     }
 
-    public void PressJump()
-    {
-        lastJumpPressedTime = Time.time;
-        jumpHeld = true;
-    }
-
-    public void ReleaseJump()
-    {
-        if (jumpHeld && isJumping) jumpCutPending = true;
-        jumpHeld = false;
-    }
+    public void PressJump() => lastJumpPressedTime = Time.time;
 
     public void UseAbility()
     {
@@ -264,7 +244,6 @@ public class PlayerCharacter : MonoBehaviour
         {
             moveInput = 0f;
             IsSprinting = false;
-            jumpHeld = false;
         }
 
         if (ability != null) ability.SetSelected(selected);
