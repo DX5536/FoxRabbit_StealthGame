@@ -4,15 +4,13 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 /// <summary>
-/// Hold [Shift] (configurable) to see circuit lines from every SecurityConsole to the doors it controls,
+/// Hold [Shift] (rebindable: Keybinds.ShowCircuit) to see circuit lines from every SecurityConsole to the doors it controls,
 /// drawn like a circuit trace (up from the console, along a bus, down to the door) in the console's Circuit Color.
 /// Lines draw in from the console when the key is pressed and fade out on release.
 /// One per scene is enough.
 /// </summary>
 public class CircuitView_Manager : MonoBehaviour
 {
-    [Tooltip("Hold to show the circuit. Note: Left Shift is also sprint - pick another key if that gets in the way.")]
-    [SerializeField] Key showKey = Key.LeftShift;
     [Tooltip("Gamepad button that also shows the circuit (none = disabled).")]
     [SerializeField] bool gamepadSelectButton = true;
 
@@ -55,7 +53,7 @@ public class CircuitView_Manager : MonoBehaviour
         if (inputAllowed)
         {
             var kb = Keyboard.current;
-            if (kb != null && kb[showKey].isPressed) held = true;
+            if (kb != null && kb[Keybinds.Get(GameAction.ShowCircuit)].isPressed) held = true;
             var pad = Gamepad.current;
             if (gamepadSelectButton && pad != null && pad.selectButton.isPressed) held = true;
         }

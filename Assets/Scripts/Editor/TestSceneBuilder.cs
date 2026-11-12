@@ -461,6 +461,7 @@ public static partial class TestSceneBuilder
             case int i: prop.intValue = i; break;
             case Color col: prop.colorValue = col; break;
             case bool b: prop.boolValue = b; break;
+            case string str: prop.stringValue = str; break;
             case Vector2 v: prop.vector2Value = v; break;
             case LayerMask m: prop.intValue = m.value; break;
             default: Debug.LogWarning($"[TestSceneBuilder] Unsupported type for '{field}'."); break;

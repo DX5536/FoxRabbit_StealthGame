@@ -44,9 +44,9 @@ public class GameOver_Manager : MonoBehaviour
     [Range(0.05f, 1f)] [SerializeField] float caughtTimeScale = 0.3f;
 
     [Header("Events")]
-    public UnityEvent onCaught;
-    public UnityEvent onLevelComplete;
-    public UnityEvent onRestart;
+    public UnityEvent onCaught = new UnityEvent();
+    public UnityEvent onLevelComplete = new UnityEvent();
+    public UnityEvent onRestart = new UnityEvent();
 
     bool restarting;
 
@@ -106,7 +106,7 @@ public class GameOver_Manager : MonoBehaviour
         if (restarting) return;
         restarting = true;
         onRestart?.Invoke();
-        DOTween.KillAll();
+        // No DOTween.KillAll: scene tweens die with their objects (SetLink); music/fade tweens must survive.
         Time.timeScale = 1f;
         IsGameOver = false;
 
@@ -126,7 +126,7 @@ public class GameOver_Manager : MonoBehaviour
 
         if (PlayerController.Instance != null) PlayerController.Instance.InputEnabled = false;
         GameOverTriggered?.Invoke();
-        if (win) onLevelComplete?.Invoke();
+        if (win) { Checkpoint.Clear(); onLevelComplete?.Invoke(); } // finished: next restart starts from the beginning
         else onCaught?.Invoke();
 
         titleText.text = win ? winTitle : caughtTitle;

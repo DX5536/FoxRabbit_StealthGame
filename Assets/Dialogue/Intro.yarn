@@ -1,0 +1,23 @@
+title: Intro
+---
+<<bg lab>>
+<<bgm intro>>
+<<show Tetra neutral left>>
+Tetra: Pricilla. Wake up. The alarms just went quiet.
+<<show Pricilla neutral right>>
+<<sfx portal>>
+Pricilla: Five more minutes...
+<<show Tetra mad left>>
+Tetra: Guards in the halls, cameras on every ceiling. We don't have five minutes.
+-> Pricilla: Fine. My portals will get us past the locked doors.
+    <<show Pricilla happy right>>
+    Tetra: And if they look our way, I'll stop time.
+-> Pricilla: Can't we just run for it?
+    <<show Pricilla mad right>>
+    Tetra: Not if you want to see daylight again.
+<<show Tetra neutral left>>
+Tetra: Stay out of their sight. Use the consoles to open the doors for each other.
+<<hide_all>>
+<<stop_bgm>>
+<<wait 0.3>>
+===

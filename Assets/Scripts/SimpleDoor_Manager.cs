@@ -42,7 +42,7 @@ public class SimpleDoor_Manager : DoorBase
     }
 
     protected override string GetStatusText(PlayerCharacter character)
-        => $"Door: {StateText}\n<size=75%>[E] {(IsOpen ? "Close" : "Open")}</size>";
+        => $"Door: {StateText}\n<size=75%>[{Keybinds.Label(GameAction.Interact)}] {(IsOpen ? "Close" : "Open")}</size>";
 
     void OnDestroy() => swingTween?.Kill();
 }

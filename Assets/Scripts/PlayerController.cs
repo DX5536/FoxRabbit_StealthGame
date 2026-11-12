@@ -6,7 +6,8 @@ using UnityEngine.InputSystem;
 
 /// <summary>
 /// Reads input and drives the selected PlayerCharacter.
-///   A/D or Arrows : move        Space / W / Up : jump (fixed height)
+/// Keys come from Keybinds (rebindable in Options). Defaults:
+///   A/D or Arrows : move        Space / Up : jump (fixed height)
 ///   Left Shift    : sprint      Q : switch character
 ///   F             : ability     E : interact
 /// Gamepad: left stick / d-pad move, South = jump, left trigger/shoulder = sprint,
@@ -31,15 +32,8 @@ public class PlayerController : MonoBehaviour
     [Tooltip("Cinemachine camera that follows the selected character. Empty = first CinemachineCamera in the scene.")]
     [SerializeField] CinemachineCamera followCamera;
 
-    [Header("Keyboard")]
-    [SerializeField] Key leftKey = Key.A;
-    [SerializeField] Key rightKey = Key.D;
-    [SerializeField] Key jumpKey = Key.Space;
-    [SerializeField] Key altJumpKey = Key.W;
-    [SerializeField] Key sprintKey = Key.LeftShift;
-    [SerializeField] Key switchKey = Key.Q;
-    [SerializeField] Key abilityKey = Key.F;
-    [SerializeField] Key interactKey = Key.E;
+    [Header("Input (keys are set in Options > Keybinding)")]
+    [Tooltip("Arrow keys always work too, whatever the keybinding.")]
     [SerializeField] bool arrowKeysToo = true;
     [SerializeField] bool gamepadSupport = true;
 
@@ -80,6 +74,10 @@ public class PlayerController : MonoBehaviour
         for (int i = 0; i < characters.Count; i++)
             characters[i].SetSelected(false, true);
 
+        if (Checkpoint.TryGetSpawns(out var spawns))
+            for (int i = 0; i < characters.Count && i < spawns.Length; i++)
+                characters[i].TeleportTo(spawns[i]);
+
         if (characters.Count > 0) Select(Mathf.Clamp(startingCharacter, 0, characters.Count - 1), true);
         else Debug.LogWarning("[PlayerController] No characters assigned.", this);
     }
@@ -107,8 +105,8 @@ public class PlayerController : MonoBehaviour
         float move = 0f;
         if (kb != null)
         {
-            if (kb[leftKey].isPressed || (arrowKeysToo && kb.leftArrowKey.isPressed)) move -= 1f;
-            if (kb[rightKey].isPressed || (arrowKeysToo && kb.rightArrowKey.isPressed)) move += 1f;
+            if (kb[Keybinds.Get(GameAction.MoveLeft)].isPressed || (arrowKeysToo && kb.leftArrowKey.isPressed)) move -= 1f;
+            if (kb[Keybinds.Get(GameAction.MoveRight)].isPressed || (arrowKeysToo && kb.rightArrowKey.isPressed)) move += 1f;
         }
         if (pad != null)
         {
@@ -116,22 +114,22 @@ public class PlayerController : MonoBehaviour
             if (Mathf.Abs(stick) > 0.2f) move = Mathf.Clamp(move + stick, -1f, 1f);
         }
 
-        bool sprint = (kb != null && kb[sprintKey].isPressed)
+        bool sprint = (kb != null && kb[Keybinds.Get(GameAction.Sprint)].isPressed)
                       || (pad != null && (pad.leftTrigger.isPressed || pad.leftShoulder.isPressed));
         active.SetMoveInput(move, sprint);
 
         // Jump
-        bool jumpDown = kb != null && (kb[jumpKey].wasPressedThisFrame || kb[altJumpKey].wasPressedThisFrame
+        bool jumpDown = kb != null && (kb[Keybinds.Get(GameAction.Jump)].wasPressedThisFrame
                                        || (arrowKeysToo && kb.upArrowKey.wasPressedThisFrame));
         if (pad != null) jumpDown |= pad.buttonSouth.wasPressedThisFrame;
         if (jumpDown) active.PressJump();
 
         // Switch / ability / interact
-        if ((kb != null && kb[switchKey].wasPressedThisFrame) || (pad != null && pad.buttonNorth.wasPressedThisFrame))
+        if ((kb != null && kb[Keybinds.Get(GameAction.SwitchCharacter)].wasPressedThisFrame) || (pad != null && pad.buttonNorth.wasPressedThisFrame))
             SwitchCharacter();
-        else if ((kb != null && kb[abilityKey].wasPressedThisFrame) || (pad != null && pad.buttonWest.wasPressedThisFrame))
+        else if ((kb != null && kb[Keybinds.Get(GameAction.Ability)].wasPressedThisFrame) || (pad != null && pad.buttonWest.wasPressedThisFrame))
             active.UseAbility();
-        else if ((kb != null && kb[interactKey].wasPressedThisFrame) || (pad != null && pad.buttonEast.wasPressedThisFrame))
+        else if ((kb != null && kb[Keybinds.Get(GameAction.Interact)].wasPressedThisFrame) || (pad != null && pad.buttonEast.wasPressedThisFrame))
             active.Interact();
     }
 

@@ -82,7 +82,8 @@ public class SecurityConsole : Interactable
             if (door.Type == SecurityDoor_Manager.DoorType.Timed && door.IsOpen) sb.Append($" {door.TimeLeft:0.0}s");
             sb.Append("</size>");
         }
-        sb.Append("\n<size=70%>[E] ").Append(anyTimed ? "Open" : "Toggle").Append("   [Shift] show circuit</size>");
+        sb.Append($"\n<size=70%>[{Keybinds.Label(GameAction.Interact)}] ").Append(anyTimed ? "Open" : "Toggle")
+          .Append($"   [{Keybinds.Label(GameAction.ShowCircuit)}] show circuit</size>");
         return sb.ToString();
     }
 
