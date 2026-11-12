@@ -26,9 +26,7 @@ public static partial class TestSceneBuilder
     static void BuildDoorLevel()
     {
         CreateProfiles();
-        doorProfile = Profile<DoorProfile>("Door_Default");
-        doorProfile.openTime = 5f;
-        EditorUtility.SetDirty(doorProfile);
+        doorProfile = Profile<DoorProfile>("Door_Default", p => p.openTime = 5f);
 
         var level = new GameObject("> Level").transform;
         var doors = new GameObject("> Doors & Consoles").transform;

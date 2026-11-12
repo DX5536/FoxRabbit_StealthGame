@@ -70,6 +70,9 @@ public class PlayerCharacter : MonoBehaviour
     public int Facing { get; private set; } = 1;
     /// <summary>Rest scale (other tweens must return here, not to a mid-animation scale).</summary>
     public Vector3 BaseScale => baseScale;
+
+    /// <summary>The character that owns this collider, or null (triggers report the touching collider).</summary>
+    public static PlayerCharacter From(Collider2D c) => c.attachedRigidbody != null ? c.attachedRigidbody.GetComponent<PlayerCharacter>() : null;
     public Rigidbody2D Body2D => rb;
     public Collider2D Collider => col;
     /// <summary>When true the character ignores movement input (e.g. while teleporting).</summary>

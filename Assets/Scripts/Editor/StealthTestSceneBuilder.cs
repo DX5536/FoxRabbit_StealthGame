@@ -217,47 +217,30 @@ public static partial class TestSceneBuilder
     {
         int obstacles = (1 << groundLayer) | 1; // Ground + Default
 
-        guardVision = Profile<EnemyVisionProfile>("Vision_Guard");
-        guardVision.radius = 6f;
-        guardVision.visionAngle = 60f;
-        guardVision.timeToDetect = 0.35f;
-        guardVision.obstacleMask = obstacles;
-
-        sentryVision = Profile<EnemyVisionProfile>("Vision_Sentry");
-        sentryVision.radius = 8f;
-        sentryVision.visionAngle = 45f;
-        sentryVision.timeToDetect = 0.5f;
-        sentryVision.obstacleMask = obstacles;
-
-        cameraVision = Profile<EnemyVisionProfile>("Vision_Camera");
-        cameraVision.radius = 8.5f;
-        cameraVision.visionAngle = 35f;
-        cameraVision.proximityRadius = 0f;
-        cameraVision.timeToDetect = 0.2f;
-        cameraVision.obstacleMask = obstacles;
-        cameraVision.idleColor = new Color(0.6f, 0.9f, 1f, 0.18f);
-
-        guardMove = Profile<EnemyMovementProfile>("Movement_Guard");
-        guardMove.moveSpeed = 2f;
-        guardMove.waitDuration = 1.5f;
-        guardMove.turnDuration = 0.3f;
-        guardMove.moveEase = Ease.InOutSine;
-
-        cameraMove = Profile<EnemyMovementProfile>("Movement_Camera");
-        cameraMove.rotateDuration = 1.6f;
-        cameraMove.rotateWaitDuration = 1.2f;
-
-        foreach (var p in new ScriptableObject[] { guardVision, sentryVision, cameraVision, guardMove, cameraMove })
-            EditorUtility.SetDirty(p);
-        AssetDatabase.SaveAssets();
+        // Starting values only: once an asset exists, your tuning is kept on rebuild.
+        guardVision = Profile<EnemyVisionProfile>("Vision_Guard", p =>
+            { p.radius = 6f; p.visionAngle = 60f; p.timeToDetect = 0.35f; p.obstacleMask = obstacles; });
+        sentryVision = Profile<EnemyVisionProfile>("Vision_Sentry", p =>
+            { p.radius = 8f; p.visionAngle = 45f; p.timeToDetect = 0.5f; p.obstacleMask = obstacles; });
+        cameraVision = Profile<EnemyVisionProfile>("Vision_Camera", p =>
+        {
+            p.radius = 8.5f; p.visionAngle = 35f; p.proximityRadius = 0f; p.timeToDetect = 0.2f;
+            p.obstacleMask = obstacles; p.idleColor = new Color(0.6f, 0.9f, 1f, 0.18f);
+        });
+        guardMove = Profile<EnemyMovementProfile>("Movement_Guard", p =>
+            { p.moveSpeed = 2f; p.waitDuration = 1.5f; p.turnDuration = 0.3f; p.moveEase = Ease.InOutSine; });
+        cameraMove = Profile<EnemyMovementProfile>("Movement_Camera", p =>
+            { p.rotateDuration = 1.6f; p.rotateWaitDuration = 1.2f; });
     }
 
-    static T Profile<T>(string name) where T : ScriptableObject
+    /// <summary>Load the profile asset, or create it with the given starting values.</summary>
+    static T Profile<T>(string name, System.Action<T> init = null) where T : ScriptableObject
     {
         string path = $"{AssetFolder}/{name}.asset";
         var existing = AssetDatabase.LoadAssetAtPath<T>(path);
         if (existing != null) return existing;
         var asset = ScriptableObject.CreateInstance<T>();
+        init?.Invoke(asset);
         AssetDatabase.CreateAsset(asset, path);
         return asset;
     }

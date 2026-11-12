@@ -47,7 +47,7 @@ public static partial class TestSceneBuilder
             return;
 
         ScreenFilterEditorTools.CreateTagsAndLayer();
-        groundLayer = EnsureLayer(GroundLayer);
+        groundLayer = ScreenFilterEditorTools.EnsureLayer(GroundLayer);
         if (groundLayer < 0) return;
 
         Directory.CreateDirectory(AssetFolder);
@@ -168,7 +168,7 @@ public static partial class TestSceneBuilder
     {
         var scenes = new System.Collections.Generic.List<EditorBuildSettingsScene>(EditorBuildSettings.scenes);
         if (scenes.Exists(s => s.path == path)) return;
-        scenes.Add(new EditorBuildSettingsScene(path, true));
+        scenes.Add(new EditorBuildSettingsScene(path, false)); // listed but unticked: test levels never ship
         EditorBuildSettings.scenes = scenes.ToArray();
     }
 
@@ -410,26 +410,6 @@ public static partial class TestSceneBuilder
     #endregion
 
     #region Helpers
-
-    static int EnsureLayer(string name)
-    {
-        int existing = LayerMask.NameToLayer(name);
-        if (existing >= 0) return existing;
-
-        var tagManager = new SerializedObject(AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/TagManager.asset")[0]);
-        var layers = tagManager.FindProperty("layers");
-        for (int i = 6; i < layers.arraySize; i++)
-        {
-            var layer = layers.GetArrayElementAtIndex(i);
-            if (!string.IsNullOrEmpty(layer.stringValue)) continue;
-            layer.stringValue = name;
-            tagManager.ApplyModifiedProperties();
-            Debug.Log($"[TestSceneBuilder] Added layer '{name}' at index {i}.");
-            return i;
-        }
-        Debug.LogError($"[TestSceneBuilder] No free layer slot for '{name}'.");
-        return -1;
-    }
 
     static Sprite CreateSquareSprite()
     {

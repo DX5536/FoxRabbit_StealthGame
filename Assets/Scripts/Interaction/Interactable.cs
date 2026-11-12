@@ -106,15 +106,9 @@ public abstract class Interactable : MonoBehaviour
 
     #region Trigger
 
-    static PlayerCharacter GetCharacter(Collider2D other)
-    {
-        var rb = other.attachedRigidbody;
-        return rb != null ? rb.GetComponent<PlayerCharacter>() : null;
-    }
-
     void OnTriggerEnter2D(Collider2D other)
     {
-        var character = GetCharacter(other);
+        var character = PlayerCharacter.From(other);
         if (character == null || !inside.Add(character)) return;
         character.AddInteractable(this);
         onCharacterEnter?.Invoke();
@@ -122,7 +116,7 @@ public abstract class Interactable : MonoBehaviour
 
     void OnTriggerExit2D(Collider2D other)
     {
-        var character = GetCharacter(other);
+        var character = PlayerCharacter.From(other);
         if (character == null || !inside.Remove(character)) return;
         character.RemoveInteractable(this);
         onCharacterExit?.Invoke();

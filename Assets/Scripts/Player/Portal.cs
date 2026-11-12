@@ -75,9 +75,7 @@ public class Portal : MonoBehaviour
 
     bool IsOwner(Collider2D other)
     {
-        if (Owner == null || Owner.Character == null) return false;
-        var rb = other.attachedRigidbody;
-        return rb != null && rb.gameObject == Owner.Character.gameObject;
+        return Owner != null && Owner.Character != null && PlayerCharacter.From(other) == Owner.Character;
     }
 
     void OnTriggerEnter2D(Collider2D other)

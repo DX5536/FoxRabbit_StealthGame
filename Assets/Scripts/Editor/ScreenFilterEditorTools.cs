@@ -21,7 +21,6 @@ public static class ScreenFilterEditorTools
 
         var tagManager = new SerializedObject(assets[0]);
         SerializedProperty tagsProp = tagManager.FindProperty("tags");
-        SerializedProperty layersProp = tagManager.FindProperty("layers");
 
         foreach (string tag in Tags)
         {
@@ -37,30 +36,30 @@ public static class ScreenFilterEditorTools
             }
         }
 
-        foreach (string layerName in Layers)
-        {
-            bool layerExists = false;
-            for (int i = 0; i < layersProp.arraySize; i++)
-                if (layersProp.GetArrayElementAtIndex(i).stringValue == layerName) { layerExists = true; break; }
-            if (layerExists) continue;
-
-            bool added = false;
-            for (int i = 6; i < layersProp.arraySize; i++) // 0-5 are Unity built-in layers
-            {
-                var layer = layersProp.GetArrayElementAtIndex(i);
-                if (string.IsNullOrEmpty(layer.stringValue))
-                {
-                    layer.stringValue = layerName;
-                    Debug.Log($"[ScreenFilters] Added layer '{layerName}' at index {i}.");
-                    added = true;
-                    break;
-                }
-            }
-            if (!added) Debug.LogError($"[ScreenFilters] No free layer slot for '{layerName}'.");
-        }
-
         tagManager.ApplyModifiedProperties();
+        foreach (string layerName in Layers) EnsureLayer(layerName);
         AssetDatabase.SaveAssets();
+    }
+
+    /// <summary>Returns the layer index, adding the layer in the first free user slot if needed (-1 if full).</summary>
+    internal static int EnsureLayer(string name)
+    {
+        int existing = LayerMask.NameToLayer(name);
+        if (existing >= 0) return existing;
+
+        var tagManager = new SerializedObject(AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/TagManager.asset")[0]);
+        var layers = tagManager.FindProperty("layers");
+        for (int i = 6; i < layers.arraySize; i++) // 0-5 are Unity built-in layers
+        {
+            var layer = layers.GetArrayElementAtIndex(i);
+            if (!string.IsNullOrEmpty(layer.stringValue)) continue;
+            layer.stringValue = name;
+            tagManager.ApplyModifiedProperties();
+            Debug.Log($"[ScreenFilters] Added layer '{name}' at index {i}.");
+            return i;
+        }
+        Debug.LogError($"[ScreenFilters] No free layer slot for '{name}'.");
+        return -1;
     }
 }
 

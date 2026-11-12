@@ -20,7 +20,7 @@ public class LevelGoal : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        var character = other.attachedRigidbody != null ? other.attachedRigidbody.GetComponent<PlayerCharacter>() : null;
+        var character = PlayerCharacter.From(other);
         if (character == null) return;
         inside.Add(character);
 
@@ -34,7 +34,7 @@ public class LevelGoal : MonoBehaviour
 
     void OnTriggerExit2D(Collider2D other)
     {
-        var character = other.attachedRigidbody != null ? other.attachedRigidbody.GetComponent<PlayerCharacter>() : null;
+        var character = PlayerCharacter.From(other);
         if (character != null) inside.Remove(character);
     }
 }

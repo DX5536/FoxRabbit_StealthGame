@@ -73,14 +73,15 @@ public class SecurityConsole : Interactable
     {
         var sb = new StringBuilder();
         sb.Append(Colored(displayName, circuitColor));
+        bool anyTimed = false;
         foreach (var door in GetDoors())
         {
+            anyTimed |= door.Type == SecurityDoor_Manager.DoorType.Timed;
             sb.Append("\n<size=80%>").Append(door.DisplayName).Append(": ")
               .Append(door.IsOpen ? Colored("OPEN", new Color(0.45f, 1f, 0.55f)) : Colored("CLOSED", new Color(1f, 0.45f, 0.4f)));
             if (door.Type == SecurityDoor_Manager.DoorType.Timed && door.IsOpen) sb.Append($" {door.TimeLeft:0.0}s");
             sb.Append("</size>");
         }
-        bool anyTimed = GetDoors().Exists(d => d.Type == SecurityDoor_Manager.DoorType.Timed);
         sb.Append("\n<size=70%>[E] ").Append(anyTimed ? "Open" : "Toggle").Append("   [Shift] show circuit</size>");
         return sb.ToString();
     }
