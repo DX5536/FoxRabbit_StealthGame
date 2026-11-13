@@ -31,6 +31,7 @@ public class SoundManager : MonoBehaviour
 
     const string MusicKey = "vol_music01", SfxKey = "vol_sfx01";
 
+    static readonly System.Collections.Generic.HashSet<string> warnedMissing = new System.Collections.Generic.HashSet<string>();
     AudioSource music, sfx;
     string currentBgm;
     Tween musicFade;
@@ -86,7 +87,7 @@ public class SoundManager : MonoBehaviour
         var entry = m.library != null ? m.library.Find(soundName) : null;
         if (entry == null || entry.clip == null)
         {
-            Debug.LogWarning($"[SoundManager] No BGM named '{soundName}' in the SoundLibrary.", this);
+            if (warnedMissing.Add(soundName)) Debug.LogWarning($"[SoundManager] No BGM named '{soundName}' in the SoundLibrary (warning shown once).", this);
             return;
         }
         m.currentBgm = soundName;

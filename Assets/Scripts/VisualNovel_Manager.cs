@@ -66,9 +66,9 @@ public class VisualNovel_Manager : MonoBehaviour
         runner.AddCommandHandler("hide_all", HideAll);
         runner.AddCommandHandler<string>("bg", SetBackground);
         runner.AddCommandHandler("bg_clear", ClearBackground);
-        runner.AddCommandHandler<string>("bgm", name => SoundManager.Instance?.PlayBGM(name));
-        runner.AddCommandHandler("stop_bgm", () => SoundManager.Instance?.StopBGM());
-        runner.AddCommandHandler<string>("sfx", name => SoundManager.Instance?.PlaySFX(name));
+        runner.AddCommandHandler<string>("bgm", PlayBgm);
+        runner.AddCommandHandler("stop_bgm", StopBgm);
+        runner.AddCommandHandler<string>("sfx", PlaySfx);
         runner.AddCommandHandler<int>("load_scene", SceneLoader.Load);
         runner.onDialogueComplete?.AddListener(Finish);
 
@@ -155,6 +155,10 @@ public class VisualNovel_Manager : MonoBehaviour
             slot.transform.DOPunchScale(Vector3.one * 0.04f, 0.2f, 4, 0.5f).SetLink(gameObject); // expression change pop
         }
     }
+
+    static void PlayBgm(string soundName) { if (SoundManager.Instance != null) SoundManager.Instance.PlayBGM(soundName); }
+    static void StopBgm() { if (SoundManager.Instance != null) SoundManager.Instance.StopBGM(); }
+    static void PlaySfx(string soundName) { if (SoundManager.Instance != null) SoundManager.Instance.PlaySFX(soundName); }
 
     void Hide(string characterId)
     {

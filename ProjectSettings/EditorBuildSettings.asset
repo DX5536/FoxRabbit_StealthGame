@@ -17,6 +17,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/StealthTestLevel.unity
     guid: 59aee77f823bd4d4fab4a8c1ceb08de1
+  - enabled: 0
+    path: Assets/Scenes/FullTestLevel.unity
+    guid: d673d41fc4316434d9e9cd33b091d1c0
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

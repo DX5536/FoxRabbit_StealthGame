@@ -7,6 +7,8 @@ using UnityEngine.SceneManagement;
 /// Guards, doors and timers reset by themselves because restart reloads the scene.
 /// Reaching the level goal clears the checkpoint (next restart starts from the beginning).
 /// Create the prefab with Tools > FoxRabbit > Create Checkpoint Prefab, then drag it into a level.
+/// Place it where no enemy can see the respawn spots (e.g. behind a closed door): after a restart both
+/// characters stand there, and the guards are back at their start positions.
 /// </summary>
 [RequireComponent(typeof(Collider2D))]
 public class Checkpoint : MonoBehaviour

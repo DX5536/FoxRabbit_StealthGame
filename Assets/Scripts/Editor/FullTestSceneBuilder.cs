@@ -56,9 +56,12 @@ public static partial class TestSceneBuilder
         CreateGuard("Guard_1", enemies, new Vector2(17f, 1f), new[] { 11f, 24f }, guardVision, -8f);
         Label("Sign_1", level, new Vector2(16.5f, 7f), "Over the guard, or stop time and walk past");
 
-        // ===== Checkpoint 1 =====
+        // ===== Checkpoint 1: safe room between two closed doors (x 26-32), out of every guard's sight =====
         Solid("Ground_2", level, new Vector2(39f, -1f), new Vector2(26f, 2f), ground);          // x 26-52
-        PlaceCheckpoint(checkpoints, new Vector2(28f, 1f));
+        CreateSimpleDoor("SimpleDoor_SafeRoom", doors, 26f);                                      // blocks Guard_1 (turns at x 24)
+        WallAbove(level, 26f, 3f, wall);
+        PlaceCheckpoint(checkpoints, new Vector2(29f, 1f));
+        Label("Sign_Checkpoint", level, new Vector2(29f, 5f), "Checkpoint - close the door behind you");
 
         // ===== 2. Swinging door, corridor guard, hiding closet (x 32-48) =====
         CreateSimpleDoor("SimpleDoor_Corridor", doors, 32f);

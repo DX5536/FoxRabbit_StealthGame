@@ -292,11 +292,10 @@ public class PlayerCharacter : MonoBehaviour
             {
                 selectionIndicator.localPosition = indicatorBasePos;
                 selectionIndicator.localScale = Vector3.zero;
-                indicatorTween = DOTween.Sequence()
-                    .Append(selectionIndicator.DOScale(1f, 0.2f).SetEase(Ease.OutBack))
-                    .Append(selectionIndicator.DOLocalMoveY(indicatorBasePos.y + indicatorBobHeight, 0.5f)
-                        .SetEase(Ease.InOutSine).SetLoops(-1, LoopType.Yoyo))
-                    .SetLink(gameObject);
+                // Pop in, then bob forever (the infinite loop can't live inside a Sequence).
+                indicatorTween = selectionIndicator.DOScale(1f, 0.2f).SetEase(Ease.OutBack).SetLink(gameObject)
+                    .OnComplete(() => indicatorTween = selectionIndicator.DOLocalMoveY(indicatorBasePos.y + indicatorBobHeight, 0.5f)
+                        .SetEase(Ease.InOutSine).SetLoops(-1, LoopType.Yoyo).SetLink(gameObject));
             }
         }
     }

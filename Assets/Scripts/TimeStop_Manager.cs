@@ -203,10 +203,12 @@ public class TimeStop_Manager : CharacterAbility
 
         if (glowTarget != null)
         {
-            var seq = DOTween.Sequence().SetLink(gameObject).SetUpdate(useUnscaledTime);
-            if (pop) seq.Append(glowTarget.DOPunchScale(glowBaseScale * 0.35f, 0.35f, 8, 0.6f));
-            seq.Append(glowTarget.DOScale(glowBaseScale * humScale, humPeriod).SetEase(Ease.InOutSine).SetLoops(-1, LoopType.Yoyo));
-            humTween = seq;
+            // Infinite loops must be on the tween itself, not inside a Sequence (DOTween warning).
+            void Hum() => humTween = glowTarget.DOScale(glowBaseScale * humScale, humPeriod).SetEase(Ease.InOutSine)
+                .SetLoops(-1, LoopType.Yoyo).SetUpdate(useUnscaledTime).SetLink(gameObject);
+            if (pop) humTween = glowTarget.DOPunchScale(glowBaseScale * 0.35f, 0.35f, 8, 0.6f)
+                .SetUpdate(useUnscaledTime).SetLink(gameObject).OnComplete(Hum);
+            else Hum();
         }
 
         if (glowMaterial != null)
