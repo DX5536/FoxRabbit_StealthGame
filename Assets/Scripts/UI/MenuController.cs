@@ -1,19 +1,22 @@
 using UnityEngine;
+using UnityEngine.Events;
 
-/// <summary>Main menu: Start, Options, Credits. Panels are plain GameObjects - animate them however you like.</summary>
+/// <summary>
+/// Main menu: Start, Options, Credits all live in one scene and stay active.
+/// This script never shows/hides panels - the buttons only raise events, so your own tweens decide what moves where.
+/// </summary>
 public class MenuController : MonoBehaviour
 {
     [Tooltip("Build index of the first game scene (File > Build Profiles).")]
     [SerializeField] int startSceneIndex = 1;
-    [SerializeField] GameObject mainPanel;
-    [SerializeField] OptionsPanel optionsPanel;
-    [SerializeField] GameObject creditsPanel;
 
-    void Start()
-    {
-        Time.timeScale = 1f;
-        ShowMain();
-    }
+    [Header("Hook your tweens here")]
+    public UnityEvent onOpenOptions;
+    public UnityEvent onOpenCredits;
+    [Tooltip("Back from Options or Credits.")]
+    public UnityEvent onBackToMain;
+
+    void Start() => Time.timeScale = 1f;
 
     public void StartGame()
     {
@@ -22,23 +25,7 @@ public class MenuController : MonoBehaviour
         SceneLoader.Load(startSceneIndex);
     }
 
-    public void OpenOptions()
-    {
-        mainPanel.SetActive(false);
-        optionsPanel.Open();
-    }
-
-    public void OpenCredits()
-    {
-        mainPanel.SetActive(false);
-        creditsPanel.SetActive(true);
-    }
-
-    /// <summary>Back buttons (Options' onClosed event and the Credits back button) land here.</summary>
-    public void ShowMain()
-    {
-        if (optionsPanel.gameObject.activeSelf) optionsPanel.Close();
-        creditsPanel.SetActive(false);
-        mainPanel.SetActive(true);
-    }
+    public void OpenOptions() => onOpenOptions?.Invoke();
+    public void OpenCredits() => onOpenCredits?.Invoke();
+    public void ShowMain() => onBackToMain?.Invoke();
 }

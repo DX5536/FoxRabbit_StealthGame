@@ -128,13 +128,13 @@ public class TimeStop_Manager : CharacterAbility
         if (hourglass != null) hourglass.StreamActive = false;
         if (drainDuringTimeStop)
         {
-            fillTween = DOTween.To(() => FillAmount, SetFill, 0f, timeStopDuration)
+            fillTween = DOTween.To(() => FillAmount, SetFill, 0f, timeStopDuration * Difficulty.TimeStopDuration)
                 .SetEase(Ease.Linear).SetUpdate(useUnscaledTime).SetLink(gameObject)
                 .OnComplete(() => EndTimeStop(true));
         }
         else
         {
-            fillTween = DOVirtual.DelayedCall(timeStopDuration, () => EndTimeStop(true), useUnscaledTime).SetLink(gameObject);
+            fillTween = DOVirtual.DelayedCall(timeStopDuration * Difficulty.TimeStopDuration, () => EndTimeStop(true), useUnscaledTime).SetLink(gameObject);
         }
         return true;
     }
@@ -164,7 +164,7 @@ public class TimeStop_Manager : CharacterAbility
         onCooldownStarted?.Invoke();
 
         fillTween?.Kill();
-        fillTween = DOTween.To(() => FillAmount, SetFill, 1f, cooldownDuration)
+        fillTween = DOTween.To(() => FillAmount, SetFill, 1f, cooldownDuration * Difficulty.TimeStopCooldown)
             .SetEase(fillEase).SetUpdate(useUnscaledTime).SetLink(gameObject)
             .OnComplete(() => BecomeReady(true));
         if (!rechargeWhileNotSelected && !IsSelected) fillTween.Pause();

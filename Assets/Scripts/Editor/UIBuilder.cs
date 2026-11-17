@@ -89,6 +89,27 @@ public static partial class TestSceneBuilder
         return slider;
     }
 
+    internal static Toggle UIToggle(string label, Transform parent, Vector2 pos, ToggleGroup group, bool isOn)
+    {
+        var go = DefaultControls.CreateToggle(new DefaultControls.Resources());
+        go.name = label + "Toggle";
+        var rt = (RectTransform)go.transform;
+        rt.SetParent(parent, false);
+        rt.anchoredPosition = pos;
+        rt.sizeDelta = new Vector2(160, 40);
+        var oldLabel = go.GetComponentInChildren<Text>();
+        var labelGo = oldLabel.gameObject;
+        Object.DestroyImmediate(oldLabel); // swap the legacy Text for TMP to match the rest of the UI
+        var tmp = labelGo.AddComponent<TextMeshProUGUI>();
+        tmp.text = label;
+        tmp.fontSize = 30;
+        tmp.alignment = TextAlignmentOptions.Left;
+        var toggle = go.GetComponent<Toggle>();
+        toggle.group = group;
+        toggle.isOn = isOn;
+        return toggle;
+    }
+
     /// <summary>Options panel (volume sliders, keybind rows, reset, back). Starts hidden.</summary>
     internal static OptionsPanel BuildOptionsPanel(Transform parent)
     {
@@ -100,16 +121,24 @@ public static partial class TestSceneBuilder
         UIText("SfxLabel", panel.transform, "Sound FX", new Vector2(-280, 220), new Vector2(300, 50), 34, TextAlignmentOptions.Left);
         var sfx = UISlider("SfxSlider", panel.transform, new Vector2(120, 220), new Vector2(500, 30));
 
+        UIText("DifficultyLabel", panel.transform, "Difficulty", new Vector2(-280, 160), new Vector2(300, 50), 34, TextAlignmentOptions.Left);
+        var group = UIRect("DifficultyGroup", panel.transform, new Vector2(120, 160), new Vector2(500, 50)).gameObject.AddComponent<ToggleGroup>();
+        group.allowSwitchOff = false;
+        var toggles = new Object[3];
+        string[] names = { "Easy", "Normal", "Hard" };
+        for (int i = 0; i < 3; i++)
+            toggles[i] = UIToggle(names[i], group.transform, new Vector2(-165 + i * 165, 0), group, i == 1);
+
         UIText("KeysTitle", panel.transform, "Keybinding  <size=60%>(click a key, then press the new one - Esc cancels)</size>",
-            new Vector2(0, 140), new Vector2(900, 50), 32);
-        var list = UIRect("KeybindList", panel.transform, new Vector2(0, -90), new Vector2(800, 400));
+            new Vector2(0, 95), new Vector2(900, 50), 32);
+        var list = UIRect("KeybindList", panel.transform, new Vector2(0, -125), new Vector2(800, 380));
         var layout = list.gameObject.AddComponent<VerticalLayoutGroup>();
         layout.spacing = 4;
         layout.childControlHeight = layout.childControlWidth = true;
         layout.childForceExpandHeight = false;
 
         var rowRt = UIRect("KeybindRowTemplate", list, Vector2.zero, new Vector2(800, 46));
-        rowRt.gameObject.AddComponent<LayoutElement>().preferredHeight = 46;
+        rowRt.gameObject.AddComponent<LayoutElement>().preferredHeight = 42;
         var actionLabel = UIText("Action", rowRt, "Action", new Vector2(-170, 0), new Vector2(440, 46), 30, TextAlignmentOptions.Left);
         var keyButton = UIButton("KeyButton", rowRt, "Key", new Vector2(230, 0), new Vector2(300, 42));
         var row = rowRt.gameObject.AddComponent<KeybindRow>();
@@ -123,6 +152,7 @@ public static partial class TestSceneBuilder
         var options = panel.gameObject.AddComponent<OptionsPanel>();
         Set(options, "musicSlider", music);
         Set(options, "sfxSlider", sfx);
+        SetArray(options, "difficultyToggles", toggles);
         Set(options, "keybindContainer", list);
         Set(options, "rowTemplate", row);
         Set(options, "resetKeysButton", reset);

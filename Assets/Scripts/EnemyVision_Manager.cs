@@ -140,7 +140,8 @@ public class EnemyVision_Manager : MonoBehaviour
 
         float before = Suspicion;
         if (SeesPlayer)
-            Suspicion = profile.timeToDetect <= 0f ? 1f : Suspicion + Time.deltaTime / profile.timeToDetect;
+            float reaction = profile.timeToDetect * Difficulty.GuardReactionTime; // 0 stays instant on every difficulty
+            Suspicion = reaction <= 0f ? 1f : Suspicion + Time.deltaTime / reaction;
         else
             Suspicion -= profile.suspicionDecay * Time.deltaTime;
         Suspicion = Mathf.Clamp01(Suspicion);

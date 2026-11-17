@@ -10,6 +10,8 @@ using UnityEngine.InputSystem.UI;
 /// <summary>
 /// Tools > FoxRabbit > Build Menu Scene
 /// Creates Assets/Scenes/Menu.unity (Start / Options / Credits) and puts it first in the build list.
+/// All panels stay active: Options waits off-screen right, Credits off-screen left. Hook your tweens to
+/// MenuController.onOpenOptions / onOpenCredits / onBackToMain.
 /// Set MenuController.startSceneIndex to your first game scene.
 /// </summary>
 public static partial class TestSceneBuilder
@@ -49,13 +51,17 @@ public static partial class TestSceneBuilder
         UIButton("StartButton", main, "Start Game", new Vector2(0, 0), new Vector2(420, 90), menu.StartGame);
         UIButton("OptionsButton", main, "Options", new Vector2(0, -110), new Vector2(420, 90), menu.OpenOptions);
         UIButton("CreditsButton", main, "Credits", new Vector2(0, -220), new Vector2(420, 90), menu.OpenCredits);
+        BuildStartSticker(main);
 
-        // Options
+        // Options: stays active, parked off-screen right - your tween slides it in on MenuController.onOpenOptions
         var options = BuildOptionsPanel(canvas);
+        options.gameObject.SetActive(true);
+        ((RectTransform)options.transform).anchoredPosition = new Vector2(1920f, 0f);
+        Set(options, "deactivateOnClose", false);
         UnityEventTools.AddPersistentListener(options.onClosed, menu.ShowMain);
 
-        // Credits (edit the text in the scene)
-        var credits = UIPanel("CreditsPanel", canvas, Vector2.zero, new Vector2(1100, 900), PanelColor);
+        // Credits: stays active, parked off-screen left - slide it in on MenuController.onOpenCredits (edit the text in the scene)
+        var credits = UIPanel("CreditsPanel", canvas, new Vector2(-1920f, 0f), new Vector2(1100, 900), PanelColor);
         UIText("Title", credits.transform, "CREDITS", new Vector2(0, 380), new Vector2(800, 80), 56);
         UIText("Body", credits.transform,
             "<b>Team</b>\nYour names here\n\n" +
@@ -68,11 +74,6 @@ public static partial class TestSceneBuilder
             "<b>Art / Music / SFX</b>\nAdd every asset you used and its license here",
             new Vector2(0, 0), new Vector2(950, 640), 32);
         UIButton("Back", credits.transform, "Back", new Vector2(0, -370), new Vector2(320, 70), menu.ShowMain);
-        credits.gameObject.SetActive(false);
-
-        Set(menu, "mainPanel", main.gameObject);
-        Set(menu, "optionsPanel", options);
-        Set(menu, "creditsPanel", credits.gameObject);
 
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene, MenuScenePath);
