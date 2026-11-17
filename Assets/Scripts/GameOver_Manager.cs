@@ -31,6 +31,12 @@ public class GameOver_Manager : MonoBehaviour
     [SerializeField] string caughtTitle = "SPOTTED!";
     [SerializeField] string winTitle = "LEVEL COMPLETE";
     [SerializeField] string restartHint = "Press [R] to restart";
+    [SerializeField] string continueHint = "Press [R] to continue";
+
+    [Header("Level Complete")]
+    [Tooltip("Build index loaded after this level is cleared (e.g. the next level, or 0 = Main Menu on the last level).
+-1 = replay this level.")]
+    [SerializeField] int nextSceneIndex = -1;
 
     [Header("Restart")]
     [SerializeField] Key restartKey = Key.R;
@@ -49,6 +55,7 @@ public class GameOver_Manager : MonoBehaviour
     public UnityEvent onRestart = new UnityEvent();
 
     bool restarting;
+    bool levelCleared;
 
     /// <summary>Toggle the debug restart-anytime at runtime (e.g. from a settings/debug menu).</summary>
     public bool AllowRestartAnytime { get => allowRestartAnytime; set => allowRestartAnytime = value; }
@@ -84,7 +91,8 @@ public class GameOver_Manager : MonoBehaviour
     {
         var kb = Keyboard.current;
         if (kb == null || !kb[restartKey].wasPressedThisFrame) return;
-        if (IsGameOver || RestartAnytimeActive) Restart();
+        if (levelCleared && nextSceneIndex >= 0) SceneLoader.Load(nextSceneIndex);
+        else if (IsGameOver || RestartAnytimeActive) Restart();
     }
 
     #region Static API
@@ -126,12 +134,13 @@ public class GameOver_Manager : MonoBehaviour
 
         if (PlayerController.Instance != null) PlayerController.Instance.InputEnabled = false;
         GameOverTriggered?.Invoke();
-        if (win) { Checkpoint.Clear(); onLevelComplete?.Invoke(); } // finished: next restart starts from the beginning
+        if (win) { levelCleared = true; Checkpoint.Clear(); onLevelComplete?.Invoke(); } // finished: next restart starts from the beginning
         else onCaught?.Invoke();
 
         titleText.text = win ? winTitle : caughtTitle;
         titleText.color = win ? new Color(0.5f, 1f, 0.6f) : new Color(1f, 0.35f, 0.3f);
-        messageText.text = string.IsNullOrEmpty(message) ? restartHint : $"{message}\n{restartHint}";
+        string hint = win && nextSceneIndex >= 0 ? continueHint : restartHint;
+        messageText.text = string.IsNullOrEmpty(message) ? hint : $"{message}\n{hint}";
 
         if (!win) Time.timeScale = caughtTimeScale;
 

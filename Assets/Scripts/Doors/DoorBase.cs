@@ -69,8 +69,7 @@ public abstract class DoorBase : Interactable
     public bool DoorwayOccupied()
     {
         if (solidCollider == null) return false;
-        var filter = new ContactFilter2D { useTriggers = false };
-        filter.NoFilter();
+        var filter = ContactFilter2D.noFilter;
         filter.useTriggers = false;
         int n = Physics2D.OverlapBox(closedBounds.center, closedBounds.size * 0.95f, 0f, filter, overlapBuffer);
         for (int i = 0; i < n; i++)
