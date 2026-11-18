@@ -11,10 +11,10 @@ public class MenuController : MonoBehaviour
     [SerializeField] int startSceneIndex = 1;
 
     [Header("Hook your tweens here")]
-    public UnityEvent onOpenOptions;
-    public UnityEvent onOpenCredits;
+    public UnityEvent onOpenOptions = new UnityEvent();
+    public UnityEvent onOpenCredits = new UnityEvent();
     [Tooltip("Back from Options or Credits.")]
-    public UnityEvent onBackToMain;
+    public UnityEvent onBackToMain = new UnityEvent();
 
     void Start() => Time.timeScale = 1f;
 

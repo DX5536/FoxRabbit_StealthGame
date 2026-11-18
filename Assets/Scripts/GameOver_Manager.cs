@@ -34,8 +34,7 @@ public class GameOver_Manager : MonoBehaviour
     [SerializeField] string continueHint = "Press [R] to continue";
 
     [Header("Level Complete")]
-    [Tooltip("Build index loaded after this level is cleared (e.g. the next level, or 0 = Main Menu on the last level).
--1 = replay this level.")]
+    [Tooltip("Build index loaded after this level is cleared (e.g. the next level, or 0 = Main Menu on the last level).\n-1 = replay this level.")]
     [SerializeField] int nextSceneIndex = -1;
 
     [Header("Restart")]

@@ -1,16 +1,18 @@
 using System.Collections.Generic;
 using System.IO;
+using TMPro;
 using UnityEditor;
 using UnityEditor.Events;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
+using UnityEngine.UI;
 
 /// <summary>
 /// Tools > FoxRabbit > Build Menu Scene
 /// Creates Assets/Scenes/Menu.unity (Start / Options / Credits) and puts it first in the build list.
-/// All panels stay active: Options waits off-screen right, Credits off-screen left. Hook your tweens to
+/// All panels stay active: Options waits off-screen right; Credits shatter out of the artwork on the right. Hook your tweens to
 /// MenuController.onOpenOptions / onOpenCredits / onBackToMain.
 /// Set MenuController.startSceneIndex to your first game scene.
 /// </summary>
@@ -60,20 +62,38 @@ public static partial class TestSceneBuilder
         Set(options, "deactivateOnClose", false);
         UnityEventTools.AddPersistentListener(options.onClosed, menu.ShowMain);
 
-        // Credits: stays active, parked off-screen left - slide it in on MenuController.onOpenCredits (edit the text in the scene)
-        var credits = UIPanel("CreditsPanel", canvas, new Vector2(-1920f, 0f), new Vector2(1100, 900), PanelColor);
-        UIText("Title", credits.transform, "CREDITS", new Vector2(0, 380), new Vector2(800, 80), 56);
-        UIText("Body", credits.transform,
-            "<b>Team</b>\nYour names here\n\n" +
-            "<b>Tools & Assets</b>\n" +
-            "Unity 6 + URP 2D, Cinemachine, Input System\n" +
-            "DOTween & DOTween Pro - Demigiant\n" +
-            "Yarn Spinner - Secret Lab\n" +
-            "All In 1 Sprite Shader - Seaside Studios\n" +
-            "Text Animator for Unity - Febucci\n\n" +
-            "<b>Art / Music / SFX</b>\nAdd every asset you used and its license here",
-            new Vector2(0, 0), new Vector2(950, 640), 32);
-        UIButton("Back", credits.transform, "Back", new Vector2(0, -370), new Vector2(320, 70), menu.ShowMain);
+        // Credits: the artwork on the right shatters into glass pieces, one credit per piece (edit the list on ShatterCredits).
+        var art = UIRect("ArtPanel", canvas, new Vector2(600f, 0f), new Vector2(720f, 1080f));
+        var raw = UIRect("Artwork", art, Vector2.zero, Vector2.zero).gameObject.AddComponent<RawImage>();
+        Stretch(raw.rectTransform);
+        raw.texture = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Art/Menu/PtN_35AnniArtCollab_XiaofengDevil50.png");
+        raw.raycastTarget = false;
+        var creditsUI = UIRect("CreditsUI", art, Vector2.zero, Vector2.zero);
+        Stretch(creditsUI);
+        var group = creditsUI.gameObject.AddComponent<CanvasGroup>();
+        UIButton("Back", creditsUI, "Back", new Vector2(0f, -480f), new Vector2(260f, 64f), menu.ShowMain);
+
+        var shatter = art.gameObject.AddComponent<ShatterCredits>();
+        Set(shatter, "artwork", raw);
+        Set(shatter, "showWhenShattered", group);
+        Set(shatter, "font", AssetDatabase.LoadAssetAtPath<TMP_FontAsset>("Assets/Font/NotoSerif-Regular SDF.asset"));
+        var so = new SerializedObject(shatter);
+        var list = so.FindProperty("credits");
+        string[,] entries =
+        {
+            { "Quicksand Font", "Andrew Paglinawan\nSIL Open Font License" },
+            { "Yarn Spinner", "Secret Lab\nyarnspinner.dev" },
+            { "Noto Serif", "Google\nSIL Open Font License" },
+        };
+        list.arraySize = entries.GetLength(0);
+        for (int i = 0; i < entries.GetLength(0); i++)
+        {
+            list.GetArrayElementAtIndex(i).FindPropertyRelative("title").stringValue = entries[i, 0];
+            list.GetArrayElementAtIndex(i).FindPropertyRelative("body").stringValue = entries[i, 1];
+        }
+        so.ApplyModifiedPropertiesWithoutUndo();
+        UnityEventTools.AddPersistentListener(menu.onOpenCredits, shatter.Shatter);
+        UnityEventTools.AddPersistentListener(menu.onBackToMain, shatter.Reassemble);
 
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene, MenuScenePath);
