@@ -4157,6 +4157,11 @@ MonoBehaviour:
   smoothing: 5
   snapBackDuration: 0.5
   flyOffDuration: 0.3
+  showPeelHint: 1
+  hintCorner: 2
+  hintInterval: 1
+  hintDuration: 1
+  hintLift: 0.2
   onClickSticker:
     m_PersistentCalls:
       m_Calls: []
@@ -6189,6 +6194,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::StickerCurlEffect
   gridSize: 12
   backsideTint: {r: 0.82, g: 0.82, b: 0.82, a: 1}
+  curlRadius: 0.12
+  curlShading: 0.35
 --- !u!114 &1619473463
 MonoBehaviour:
   m_ObjectHideFlags: 0
