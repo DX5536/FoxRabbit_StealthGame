@@ -12,7 +12,7 @@ using DG.Tweening;
 
 [RequireComponent(typeof(Image))]
 public class StickerPeelManager : MonoBehaviour,
-    IPointerDownHandler, IDragHandler, IEndDragHandler
+    IPointerDownHandler, IPointerUpHandler, IDragHandler, IEndDragHandler
 {
     [Header("Interaction")]
     [Tooltip("Untick to lock the sticker (e.g. until a menu animation finishes).")]
@@ -41,6 +41,18 @@ public class StickerPeelManager : MonoBehaviour,
     [SerializeField] private float snapBackDuration = 0.25f;
     [SerializeField] private float flyOffDuration = 0.35f;
 
+    [Header("Peel Hint (needs a StickerCurlEffect)")]
+    [Tooltip("At rest, one corner lifts a little now and then to show the sticker can be dragged off. Untick to reuse the sticker without the hint.")]
+    [SerializeField] private bool showPeelHint = true;
+    [Tooltip("The corner that lifts.")]
+    [SerializeField] private HintCorner hintCorner = HintCorner.TopRight;
+    [Tooltip("Seconds of rest between two corner lifts.")]
+    [SerializeField] private float hintInterval = 2f;
+    [Tooltip("Seconds one corner takes to lift and settle back.")]
+    [SerializeField] private float hintDuration = 0.6f;
+    [Tooltip("How far the corner lifts, as a fraction of a full peel.")]
+    [Range(0.01f, 0.3f)] [SerializeField] private float hintLift = 0.08f;
+
     [Header("Events")]
     [SerializeField] private UnityEvent onClickSticker;
     [SerializeField] private UnityEvent onFinishPeeling;
@@ -58,11 +70,17 @@ public class StickerPeelManager : MonoBehaviour,
     private float displayedProgress;
     private float targetTilt;
     private float displayedTilt;
+    private float progressVelocity, tiltVelocity;
 
     private readonly System.Collections.Generic.List<Graphic> fadingChildren = new System.Collections.Generic.List<Graphic>();
 
     private bool isDragging;
     private bool peeled;
+
+    public enum HintCorner { TopRight, TopLeft, BottomLeft, BottomRight }
+    private static readonly Vector2[] HintCorners = { new Vector2(1f, 1f), new Vector2(-1f, 1f), new Vector2(-1f, -1f), new Vector2(1f, -1f) };
+    private float hintClock;
+    private bool hintBent;
 
     private void Start()
     {
@@ -98,18 +116,56 @@ public class StickerPeelManager : MonoBehaviour,
     private void Update()
     {
         if (peeled) return;
-        // At rest: nothing to animate, so don't rebuild the curl mesh every frame.
-        if (!isDragging && targetProgress == 0f && displayedProgress < 0.0001f && Mathf.Abs(displayedTilt) < 0.01f) return;
+        // At rest: only the hint animates (and it rebuilds the curl mesh only while a corner is lifting).
+        if (!isDragging && targetProgress == 0f && displayedProgress < 0.0001f && Mathf.Abs(displayedTilt) < 0.01f)
+        {
+            UpdateHint();
+            return;
+        }
 
-        // Ease displayed values toward their targets - this is what makes the tilt and the curl feel tweened instead of snapping with the pointer.
-        float t = 1f - Mathf.Exp(-smoothing * Time.deltaTime);
-        displayedTilt = Mathf.LerpAngle(displayedTilt, targetTilt, t);
-        displayedProgress = Mathf.Lerp(displayedProgress, targetProgress, t);
+        // Ease displayed values toward their targets with a critically damped spring (like sticker-forge): it accelerates and settles
+        // smoothly, instead of jumping to full speed the moment the pointer moves.
+        float smoothTime = 1f / Mathf.Max(0.01f, smoothing);
+        displayedTilt = Mathf.SmoothDampAngle(displayedTilt, targetTilt, ref tiltVelocity, smoothTime);
+        displayedProgress = Mathf.Clamp01(Mathf.SmoothDamp(displayedProgress, targetProgress, ref progressVelocity, smoothTime));
 
         stickerRT.localRotation = Quaternion.Euler(0f, 0f, displayedTilt);
         stickerRT.localScale = Vector3.one * Mathf.Lerp(1f, maxLiftScale, displayedProgress);
         curlEffect?.SetCurl(displayedProgress, dragDirection);
         foreach (Graphic g in fadingChildren) g.canvasRenderer.SetAlpha(1f - displayedProgress);
+    }
+
+    // Lifts the chosen corner: wait hintInterval, then up and back down over hintDuration, repeat.
+    private void UpdateHint()
+    {
+        if (curlEffect == null) return;
+        if (!showPeelHint || !interactable)
+        {
+            if (hintBent) FlattenHint();
+            hintClock = 0f;
+            return;
+        }
+
+        hintClock += Time.deltaTime;
+        float phase = (hintClock - hintInterval) / Mathf.Max(0.01f, hintDuration);
+        if (phase < 0f) return;
+        if (phase >= 1f)
+        {
+            FlattenHint();
+            hintClock = 0f;
+            return;
+        }
+
+        // The curl folds the side opposite the direction first, so point it from the corner toward the centre (along the diagonal).
+        Vector2 dir = -Vector2.Scale(HintCorners[(int)hintCorner], stickerRT.rect.size).normalized;
+        curlEffect.SetCurl(hintLift * Mathf.Sin(phase * Mathf.PI), dir);
+        hintBent = true;
+    }
+
+    private void FlattenHint()
+    {
+        curlEffect.SetCurl(0f, dragDirection);
+        hintBent = false;
     }
 
     //Pointer handlers (clicks on the child bubble up to this parent)
@@ -120,6 +176,8 @@ public class StickerPeelManager : MonoBehaviour,
 
         grabScreenPos = e.position;
         isDragging = true;
+        hintClock = 0f; // the drag takes over the curl; the hint restarts its wait after the sticker settles
+        hintBent = false;
         // Read per drag: the scale changes when the browser window resizes / goes fullscreen.
         Canvas canvas = GetComponentInParent<Canvas>();
         if (canvas != null) canvasScale = canvas.scaleFactor;
@@ -127,6 +185,12 @@ public class StickerPeelManager : MonoBehaviour,
 
         // Cancel any snap-back tween still running from a previous failed peel to avoid Tween conflicts
         stickerRT.DOKill();
+    }
+
+    // A click without movement never gets OnEndDrag, so release the drag state here (a real drag is ended by OnEndDrag).
+    public void OnPointerUp(PointerEventData e)
+    {
+        if (!e.dragging) isDragging = false;
     }
 
     public void OnDrag(PointerEventData e)

@@ -1,0 +1,9 @@
+Short (menu / itch.io page):
+UI sound effects: Cuelume by Daniel Belyi - MIT License - https://github.com/danielwh2/cuelume
+
+Long:
+UI sound effects from Cuelume (themes: Default, Mech, Bubble, Press)
+by Daniel Belyi - https://cuelume-site.pages.dev/
+Source: https://github.com/danielwh2/cuelume
+License: MIT License, Copyright (c) 2026 Daniel Belyi (full text in Cuelume_LICENSE.txt)
+Rendered to WAV from the library's own offline renderer (scripts/sound.mjs), normal emphasis.
